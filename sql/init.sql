@@ -1,10 +1,10 @@
-create table users (
+create table if not exists users (
     login varchar(50) primary key,
     password_hash varchar(255) not null,
     email varchar(100) not null
 );
 
-create table user_privileges (
+create table if not exists user_privileges (
     user_login varchar(50) not null,
     privilege_name varchar(100) not null,
 
@@ -13,11 +13,11 @@ create table user_privileges (
         on delete cascade
 );
 
-create table pages (
+create table if not exists pages (
     id serial primary key
 );
 
-create table page_translations (
+create table if not exists page_translations (
     page_id integer not null,
     lang_code varchar(10) not null,
     content text not null,
@@ -27,12 +27,12 @@ create table page_translations (
         on delete cascade
 );
 
-create table news (
+create table if not exists news (
     id serial primary key,
     date date not null
 );
 
-create table news_translations (
+create table if not exists news_translations (
     news_id integer not null,
     lang_code varchar(10) not null,
     title varchar(200) not null,
@@ -43,11 +43,11 @@ create table news_translations (
         on delete cascade
 );
 
-create table categories (
+create table if not exists categories (
     id serial primary key
 );
 
-create table category_translations (
+create table if not exists category_translations (
     category_id integer not null,
     lang_code varchar(10) not null,
     name varchar(150) not null,
@@ -57,7 +57,7 @@ create table category_translations (
         on delete cascade
 );
 
-create table products (
+create table if not exists products (
     id serial primary key,
     category_id integer not null,
     price decimal(10,2) not null,
@@ -66,7 +66,7 @@ create table products (
     foreign key (category_id) references categories(id)
 );
 
-create table product_translations (
+create table if not exists product_translations (
     product_id integer not null,
     lang_code varchar(10) not null,
     name varchar(200) not null,
@@ -77,7 +77,7 @@ create table product_translations (
         on delete cascade
 );
 
-create table product_images (
+create table if not exists product_images (
     id serial primary key,
     product_id integer not null,
     image_url varchar(255) not null,
@@ -86,7 +86,7 @@ create table product_images (
         on delete cascade
 );
 
-create table orders (
+create table if not exists orders (
     id serial primary key,
     date timestamp default current_timestamp,
     customer_name varchar(150) not null,
@@ -99,7 +99,7 @@ create table orders (
     total decimal(10,2)
 );
 
-create table ordered_products (
+create table if not exists ordered_products (
     id serial primary key,
     order_id integer not null,
     product_id integer not null,
@@ -111,7 +111,7 @@ create table ordered_products (
     foreign key (product_id) references products(id)
 );
 
-create table reviews (
+create table if not exists reviews (
     id serial primary key,
     product_id integer not null,
     author_name varchar(100) not null,
@@ -125,7 +125,7 @@ create table reviews (
         on delete cascade
 );
 
-create table callback_messages (
+create table if not exists callback_messages (
     id serial primary key,
     name varchar(100) not null,
     email varchar(100) not null,
