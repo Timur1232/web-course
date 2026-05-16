@@ -1,0 +1,13 @@
+{
+    "name": "timur/web",
+    "type": "project",
+    "require": {
+        "firebase/php-jwt": "^7.0"
+    },
+    "authors": [
+        {
+            "name": "Timur",
+            "email": "timtimch123@gmail.com"
+        }
+    ]
+}
