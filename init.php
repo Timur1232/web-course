@@ -1,5 +1,4 @@
 <?php
-use Exception;
 
 final class Init {
     // Path to corresponding directory of currently loaded module.

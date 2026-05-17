@@ -1,12 +1,23 @@
 <?php namespace App\Core\Context;
 use App\Core\Helpers\Error;
+use App\Core\Helpers\Helpers;
+use App\Core\Helpers\Log;
 use App\Core\Middleware;
+use App\Core\View\Component;
+use App\Core\View\View;
 use Closure;
+use Throwable;
+
+// TODO: Refactor Router and Route_Group classes to remove duplicated code
 
 final class Router {
 
     private static bool $handled = false;
     private static Request $request;
+    public static ?Component $not_found = null;
+    public static ?Component $method_not_allowed = null;
+    public static ?Component $internal_error = null;
+    public static array $global_middleware = [];
 
     private function __construct() {}
 
@@ -85,30 +96,52 @@ final class Router {
      * @param array<int,Middleware|class-string> $middleware
      */
     private static function dispatch(Closure $handler, array $middleware): bool {
-        // TODO: Change error handling, because this is not obvious that it will not return
         if (!self::$handled) {
+            header('HX-Retarget: body');
+            header('HX-Reswap: innerHTML');
             if (self::$request->method == HTTP_Method::NONE) {
-                Error::method_not_allowed();
+                http_response_code(405);
+                $err_comp = self::$method_not_allowed ?? View::error_component('405 Method Now Allowed', 'Oops...');
             } else {
-                Error::not_found(self::$request->url->path);
+                http_response_code(404);
+                $err_comp = self::$method_not_allowed ?? View::error_component('404 Not Found', 'Oops...');
             }
+            echo $err_comp->render();
             return false;
         }
 
         Error::assert(isset($handler), __METHOD__.': No handler function');
 
-        if (count($middleware) !== 0) {
-            foreach (array_reverse($middleware) as $mw) {
-                if (is_string($mw)) {
-                    $mw = new $mw;
+        try {
+            if (count(self::$global_middleware) !== 0) {
+                foreach (array_reverse(self::$global_middleware) as $mw) {
+                    if (is_string($mw)) {
+                        $mw = new $mw;
+                    }
+                    $handler = $mw->apply($handler);
                 }
-                $handler = $mw->apply(self::$request, $handler);
             }
-        }
+            if (count($middleware) !== 0) {
+                foreach (array_reverse($middleware) as $mw) {
+                    if (is_string($mw)) {
+                        $mw = new $mw;
+                    }
+                    $handler = $mw->apply($handler);
+                }
+            }
 
-        $response = $handler(self::$request);
-        $comp = $response->apply();
-        echo $comp->render();
+            $response = $handler(self::$request);
+            $comp = $response->apply();
+            echo $comp->render();
+        } catch (Throwable $e) {
+            Log::error(__METHOD__.': '.$e->getMessage());
+            http_response_code(500);
+            header('HX-Retarget: body');
+            header('HX-Reswap: innerHTML');
+            $err_comp = self::$internal_error ?? View::error_component('500 Internal Error', 'Oops...');
+            echo $err_comp->render();
+            return false;
+        }
 
         return true;
     }
@@ -119,8 +152,8 @@ final class Route_Group {
      * @param array<int,Middleware|class-string> $middleware
      */
     public function __construct(
-        private string $group_path,
-        private array $middleware = [],
+        public string $group_path,
+        public array  $middleware = [],
     ) { }
 
     /**

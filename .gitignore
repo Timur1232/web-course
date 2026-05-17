@@ -1,2 +1,4 @@
 vendor/
 nob
+nob.old
+*.lock

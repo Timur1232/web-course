@@ -6,30 +6,19 @@ create table if not exists users (
 
 create table if not exists user_privileges (
     user_login varchar(50) not null,
-    privilege_name varchar(100) not null,
+    privilege_name varchar(20) not null,
 
     primary key (user_login, privilege_name),
     foreign key (user_login) references users(login)
         on delete cascade
 );
 
-create table if not exists pages (
-    id serial primary key
-);
-
-create table if not exists page_translations (
-    page_id integer not null,
-    lang_code varchar(10) not null,
-    content text not null,
-
-    primary key (page_id, lang_code),
-    foreign key (page_id) references pages(id)
-        on delete cascade
-);
-
 create table if not exists news (
-    id serial primary key,
-    date date not null
+    id integer primary key autoincrement,
+    date date not null,
+    type varchar(10) default 'news',
+
+    check (type in ('news', 'promotion'))
 );
 
 create table if not exists news_translations (
@@ -44,7 +33,11 @@ create table if not exists news_translations (
 );
 
 create table if not exists categories (
-    id serial primary key
+    id integer primary key,
+    parent_id integer default null,
+
+    foreign key (parent_id) references categories(id)
+        on delete cascade
 );
 
 create table if not exists category_translations (
@@ -58,7 +51,7 @@ create table if not exists category_translations (
 );
 
 create table if not exists products (
-    id serial primary key,
+    id integer primary key,
     category_id integer not null,
     price decimal(10,2) not null,
     visible boolean default true,
@@ -78,8 +71,9 @@ create table if not exists product_translations (
 );
 
 create table if not exists product_images (
-    id serial primary key,
+    id integer primary key,
     product_id integer not null,
+    number integer not null,
     image_url varchar(255) not null,
 
     foreign key (product_id) references products(id)
@@ -87,7 +81,7 @@ create table if not exists product_images (
 );
 
 create table if not exists orders (
-    id serial primary key,
+    id integer primary key,
     date timestamp default current_timestamp,
     customer_name varchar(150) not null,
     phone varchar(30) not null,
@@ -100,7 +94,7 @@ create table if not exists orders (
 );
 
 create table if not exists ordered_products (
-    id serial primary key,
+    id integer primary key,
     order_id integer not null,
     product_id integer not null,
     count integer not null,
@@ -112,7 +106,7 @@ create table if not exists ordered_products (
 );
 
 create table if not exists reviews (
-    id serial primary key,
+    id integer primary key,
     product_id integer not null,
     author_name varchar(100) not null,
     date timestamp default current_timestamp,
@@ -126,7 +120,7 @@ create table if not exists reviews (
 );
 
 create table if not exists callback_messages (
-    id serial primary key,
+    id integer primary key,
     name varchar(100) not null,
     email varchar(100) not null,
     message text not null,

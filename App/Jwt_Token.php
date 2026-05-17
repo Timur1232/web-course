@@ -1,7 +1,10 @@
-<?php namespace App\Core;
+<?php namespace App;
 use App\Config;
-use App\Core\Model\DBModel;
+use App\Core\Model\AR_Reflect;
+use App\Core\Model\DB_Model;
+use App\Models\Common_Sql;
 use App\Models\User;
+use App\Models\User_Privileges;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use stdClass;
@@ -15,7 +18,7 @@ final class Jwt_Token {
             'iat' => 1356999524,
             'nbf' => 1357000000,
             'user_login' => $user->login,
-            'is_admin' => $user->is_admin,
+            'user_privilege' => $user->privilege,
         ];
 
         $jwt = JWT::encode($payload, $key, 'HS256');
@@ -27,8 +30,13 @@ final class Jwt_Token {
         $headers = new stdClass();
         $decoded = JWT::decode($jwt, new Key(Config::JWT_SECRET_KEY, 'HS256'), $headers);
         $user_login = $decoded->user_login;
-        $model = DBModel::sqlite(Config::SQLITE_DB_PATH);
-        $res = $model->find_by_id(User::class, $user_login);
-        return $res->val ?? null;
+        $res = DB_Model::query(Common_Sql::select(User::class, where: "login = ?"))
+            ?->bind_values([$user_login])
+            ?->execute()
+            ?->fetch();
+        if (is_null($res)) return null;
+        $user = AR_Reflect::construct(User::class, $res);
+        $user->privilege = User_Privileges::from($decoded->user_privilege);
+        return $user;
     }
 }

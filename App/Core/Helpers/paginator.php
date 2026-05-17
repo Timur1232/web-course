@@ -17,13 +17,6 @@ final class Paginator {
     }
 
     /**
-     * @param T[] $items
-     */
-    public static function from(array $items, int $per_page = self::DEFAUL_PER_PAGE): self {
-        return new self(items: $items, per_page: $per_page);
-    }
-
-    /**
      * @return iterable<?T[]>
      */
     public function paginate(): iterable {

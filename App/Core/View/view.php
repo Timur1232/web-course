@@ -49,6 +49,15 @@ final class View {
         return self::func(fn() => $str);
     }
 
+    public static function error_component(string $title, string $msg): Component_Func {
+        return self::func(function () use ($title, $msg): string {
+            return <<<HTML
+                <h1>{$title}</h1>
+                <p>{$msg}</p>
+                HTML;
+        });
+    }
+
     public static function msg_tag(string $msg, string $id = 'msg'): Component_Func {
         return self::func(function () use ($msg, $id) {
             return <<<HTML

@@ -1,4 +1,6 @@
 <?php namespace App\Controllers;
 \Init::load([
-    'controllers',
+    'products',
+    'user_actions',
+    'cart',
 ]);

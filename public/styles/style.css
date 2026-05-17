@@ -1,0 +1,606 @@
+/* ======================= reset.css ======================= */
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* ======================= My CSS ======================= */
+
+:root {
+    --color-white: #f8f5f0;
+    --color-black: #000000;
+    --color-gold-light: #f2c94c;
+    --color-gold: #d4af37;
+    --color-gold-dark: #b8960c;
+    --color-bg: #f8f5f0;
+    --color-text: #1a1a1a;
+    --color-header-bg: #0d0d0d;
+    --color-header-text: var(--color-gold-light);
+    --color-nav-bg: #1c1c1c;
+    --color-nav-link: var(--color-gold);
+    --color-nav-hover: var(--color-gold-light);
+    --color-footer-bg: #0d0d0d;
+    --color-footer-text: #cccccc;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+}
+.page-wrapper {
+    width: 1024px;
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+header {
+    background-color: var(--color-header-bg);
+    color: var(--color-header-text);
+    width: 100%;
+}
+.header-inner {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 15px 0 0 0;
+}
+.header-top {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--color-gold-light);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-right: 30px;
+    text-decoration: none;
+}
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--color-white);
+    border-radius: 4px;
+    overflow: hidden;
+    flex: 1;
+    margin-right: 20px;
+}
+.search-bar input {
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    flex: 1;
+    outline: none;
+}
+.search-bar button {
+    background: var(--color-gold);
+    border: none;
+    padding: 9px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--color-black);
+}
+.cart-button {
+    background: var(--color-gold-dark);
+    color: var(--color-white);
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 15px;
+}
+.cart-count {
+    color: red;
+    font-weight: bold;
+    margin-left: -10px;
+    margin-right: 10px;
+}
+.lang-select select {
+    padding: 6px;
+    background: var(--color-gold-dark);
+    color: var(--color-white);
+    border: none;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 15px;
+}
+.user-actions .login-button,
+.user-actions .logout-button {
+    background: var(--color-gold);
+    color: var(--color-black);
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-block;
+}
+.user-actions .login-button:hover,
+.user-actions .logout-button:hover {
+    background: var(--color-gold-light);
+}
+.user-login {
+    color: var(--color-gold-light);
+    font-weight: 500;
+    margin-right: 5px;
+}
+
+/* main navigation */
+nav.main-nav {
+    background-color: var(--color-nav-bg);
+    margin-top: 15px;
+}
+nav.main-nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+nav.main-nav li {
+    position: relative;
+}
+nav.main-nav a {
+    display: block;
+    padding: 12px 20px;
+    color: var(--color-nav-link);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s, background 0.2s;
+}
+nav.main-nav a:hover,
+nav.main-nav a.active {
+    color: var(--color-nav-hover);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+    background: var(--color-white);
+}
+
+footer {
+    background-color: var(--color-footer-bg);
+    color: var(--color-footer-text);
+    width: 100%;
+}
+.footer-inner {
+    max-width: 1024px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+}
+
+
+.auth-form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    background: var(--color-white);
+    border: 1px solid #e0d8c8;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.auth-form h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--color-gold-dark);
+    text-align: center;
+}
+.auth-form .form-error {
+    background: #ffe8e8;
+    color: #b00020;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+.auth-form label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+.auth-form input:focus {
+    border-color: var(--color-gold);
+    outline: none;
+}
+.auth-form button[type="submit"] {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--color-gold);
+    color: var(--color-black);
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.auth-form button[type="submit"]:hover {
+    background: var(--color-gold-light);
+}
+.auth-form p {
+    text-align: center;
+    margin-top: 15px;
+}
+.auth-form p a {
+    color: var(--color-gold-dark);
+    text-decoration: none;
+}
+
+
+/* Каталог */
+.catalog-layout {
+    display: flex;
+    gap: 20px;
+}
+.catalog-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+}
+.catalog-main {
+    flex: 1;
+}
+.categories-panel {
+    background: #fafaf5;
+    padding: 15px;
+    border: 1px solid #e0d8c8;
+}
+.categories-panel h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: var(--color-gold-dark);
+}
+.categories-panel ul {
+    list-style: none;
+    padding: 0;
+}
+.categories-panel li {
+    margin-bottom: 6px;
+}
+.categories-panel a {
+    display: block;
+    padding: 6px 8px;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background 0.2s;
+}
+.categories-panel a.active,
+.categories-panel a:hover {
+    background: var(--color-gold-light);
+    color: var(--color-black);
+    font-weight: 500;
+}
+/* Сетка товаров */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+.product-card {
+    border: 1px solid #e0d8c8;
+    padding: 15px;
+    text-align: center;
+    background: var(--color-white);
+    transition: box-shadow 0.2s;
+}
+.product-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.product-card-image img {
+    max-width: 100%;
+    height: 140px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+.product-card-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--color-text);
+    height: 40px;
+    overflow: hidden;
+}
+.product-card-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--color-gold-dark);
+    margin-bottom: 10px;
+}
+.product-card-add {
+    background: var(--color-gold);
+    color: var(--color-black);
+    border: 1px solid var(--color-gold-dark);
+    padding: 6px 14px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.product-card-add:hover {
+    background: var(--color-gold-light);
+}
+.product-card-added {
+    background: #e0e0e0;
+    color: #666;
+    border: 1px solid #ccc;
+    padding: 6px 14px;
+    font-weight: 500;
+    cursor: default;
+}
+/* Пагинация */
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+.pagination a {
+    display: inline-block;
+    padding: 6px 12px;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    color: var(--color-text);
+    transition: background 0.2s;
+}
+.pagination a.active {
+    background: var(--color-gold);
+    border-color: var(--color-gold-dark);
+    color: var(--color-black);
+    font-weight: bold;
+}
+.pagination a:hover {
+    background: #f0f0f0;
+}
+.no-products {
+    text-align: center;
+    color: #888;
+    padding: 40px;
+}
+
+
+/* Карточка товара – ссылка */
+.product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Детальная страница */
+.product-detail {
+    padding: 10px 0;
+}
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--color-gold-dark);
+    text-decoration: none;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+.product-detail-main {
+    display: flex;
+    gap: 30px;
+}
+.product-detail-gallery {
+    flex: 1;
+    max-width: 500px;
+}
+.main-image {
+    width: 500px;
+    height: 500px;
+    object-fit: contain;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+}
+.product-thumbnails {
+    display: flex;
+    gap: 8px;
+}
+.product-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.product-thumb:hover {
+    border-color: var(--color-gold);
+}
+.product-detail-info {
+    flex: 1;
+}
+.product-detail-info h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+.product-detail-price {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--color-gold-dark);
+    margin-bottom: 20px;
+}
+.product-detail-desc h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+.product-detail-desc p {
+    line-height: 1.5;
+}
+.product-detail-info .product-card-add {
+    margin-top: 20px;
+    padding: 10px 24px;
+    font-size: 16px;
+}
+
+
+/* Корзина */
+.cart-page {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.cart-page h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.cart-items {
+    margin-bottom: 20px;
+}
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0d8c8;
+}
+.cart-item-name {
+    flex: 2;
+}
+.cart-item-price,
+.cart-item-subtotal {
+    flex: 1;
+    text-align: right;
+}
+.cart-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.qty-btn {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+.qty-btn:hover {
+    background: #ddd;
+}
+.qty-val {
+    min-width: 20px;
+    text-align: center;
+}
+.remove-btn {
+    background: none;
+    border: none;
+    color: #c00;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.cart-total {
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+.checkout-form {
+    margin-top: 30px;
+}
+.checkout-form h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+.checkout-form label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+.checkout-form input[type="text"],
+.checkout-form input[type="tel"],
+.checkout-form input[type="email"],
+.checkout-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+.checkout-form .checkout-submit {
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: var(--color-gold);
+    border: 1px solid var(--color-gold-dark);
+    cursor: pointer;
+    font-weight: bold;
+}
+.order-success {
+    text-align: center;
+    font-size: 18px;
+    padding: 40px;
+    color: green;
+}

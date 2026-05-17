@@ -3,44 +3,35 @@ use App\Core\Model\AR_Field;
 use App\Core\Model\Active_Record;
 use DateTime;
 
+enum User_Privileges : string {
+    case ADMIN    = 'admin';
+    case CUSTOMER = 'customer';
+}
+
 #[Active_Record('users')]
 final class User {
     public function __construct(
-        #[AR_Field('login')]         public ?string $login         = null,
-        #[AR_Field('email')]         public ?string $email         = null,
-        #[AR_Field('password_hash')] public ?string $password_hash = null,
+        #[AR_Field('login')]         public ?string         $login         = null,
+        #[AR_Field('email')]         public ?string         $email         = null,
+        #[AR_Field('password_hash')] public ?string         $password_hash = null,
+                                     public User_Privileges $privilege     = User_Privileges::CUSTOMER,
     ) {}
 }
 
 #[Active_Record('user_privileges')]
 final class User_Privilege {
     public function __construct(
-        #[AR_Field('user_login')]     public ?string $user_login = null,
+        #[AR_Field('user_login')]     public ?string $user_login     = null,
         #[AR_Field('privilege_name')] public ?string $privilege_name = null,
-    ) {}
-}
-
-#[Active_Record('pages')]
-final class Page {
-    public function __construct(
-        #[AR_Field('id')] public ?int $id = null,
-    ) {}
-}
-
-#[Active_Record('page_translations')]
-final class Page_Translation {
-    public function __construct(
-        #[AR_Field('page_id')]   public ?int    $page_id   = null,
-        #[AR_Field('lang_code')] public ?string $lang_code = null,
-        #[AR_Field('content')]   public ?string $content   = null,
     ) {}
 }
 
 #[Active_Record('news')]
 final class News {
     public function __construct(
-        #[AR_Field('id')]   public ?int $id        = null,
-        #[AR_Field('date')] public ?DateTime $date = null,
+        #[AR_Field('id')]     public ?int $id        = null,
+        #[AR_Field('date')]   public ?DateTime $date = null,
+        #[AR_Field(('type'))] public ?string $type   = null,
     ) {}
 }
 
@@ -95,6 +86,7 @@ final class Product_Image {
     public function __construct(
         #[AR_Field('id')]         public ?int    $id         = null,
         #[AR_Field('product_id')] public ?int    $product_id = null,
+        #[AR_Field('number')]     public ?int    $number     = null,
         #[AR_Field('image_url')]  public ?string $image_url  = null,
     ) {}
 }

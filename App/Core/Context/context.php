@@ -22,14 +22,15 @@ final class Request {
     * @param array<string,mixed>  $additional
     */
     public function __construct(
-        public URL        $url,
+        public URL         $url,
         public HTTP_Method $method     = HTTP_Method::NONE,
-        public array      $form       = [],
-        public array      $form_files = [],
-        public array      $headers    = [],
-        public bool       $htmx       = false,
-        public array      $binds      = [],
-        public array      $additional = [],
+        public array       $form       = [],
+        public array       $form_files = [],
+        public array       $headers    = [],
+        public bool        $htmx       = false,
+        public array       $binds      = [],
+        public array       $additional = [],
+        public array       $cookies    = [],
     ) { }
 
     public static function current(): self {
@@ -45,6 +46,7 @@ final class Request {
             form_files: $_FILES,
             headers: $headers,
             htmx: isset($headers['HX-Request']),
+            cookies: $_COOKIE,
         );
     }
 

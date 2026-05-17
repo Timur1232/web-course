@@ -35,10 +35,22 @@ final class DB_Stmt {
     }
 
     /**
-     * @param array<int|string,mixed> $vals
+     * @param mixed|array<int|string,mixed> $data
      */
-    public function bind_values(array $vals): ?self {
+    public function bind_values(mixed $data): ?self {
         if (is_null($this->stmt)) return null;
+
+        $vals = [];
+        if (is_array($data)) {
+            $vals = $data;
+        } else {
+            $ar = AR_Reflect::from($data::class);
+            if (is_null($ar)) return null;
+            foreach ($ar->fields_to_columns_array() as $field => $column) {
+                $vals[$column] = $data->$field;
+            }
+        }
+
         $count = 1;
         foreach ($vals as $index => $val) {
             if (is_int($index)) {

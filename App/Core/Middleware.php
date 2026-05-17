@@ -8,5 +8,5 @@ interface Middleware {
      * @param Closure(Request): Response $next
      * @return Closure(Request): Response
      */
-    function apply(Request $req, Closure $next): Closure;
+    function apply(Closure $next): Closure;
 }

@@ -12,10 +12,6 @@
 - HTMX (js)
 - Firebase JWT (php)
 
-# БД таблицы
-
-- User
-
 # Вариант
 
 Номер: 17

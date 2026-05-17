@@ -1,7 +1,17 @@
 <?php namespace App\Core\Model;
 use App\Core\Helpers\Log;
 use App\Core\Helpers\Error;
-use Closure;
+
+final class Dependency_Error {
+    public function __construct(
+        public string $rule,
+        public string $reason,
+    ) { }
+
+    public static function new(string $rule, string $reason): self {
+        return new self($rule, $reason);
+    }
+}
 
 /*
  * WARNING: By default assumes that data is of type string.
@@ -136,22 +146,22 @@ final class DataValidator {
      * Only for debugging.
      */
     public function debug_validate_dependences(): void {
-        /** @var DependencyError[] $invalid */
+        /** @var Dependency_Error[] $invalid */
         $invalid = [];
         foreach ($this->dependences as $rule => $deps) {
             if (!array_key_exists($rule, $this->rules)) {
-                $invalid[] = DependencyError::new($rule, 'not in rules set');
+                $invalid[] = Dependency_Error::new($rule, 'not in rules set');
                 continue;
             }
             foreach ($deps as $dep) {
                 if (!array_key_exists($dep, $this->rules)) {
-                    $invalid[] = DependencyError::new($dep, 'not in rules set');
+                    $invalid[] = Dependency_Error::new($dep, 'not in rules set');
                 }
                 // TODO: make detecting deep circular dependences
                 if ($dep === $rule) {
-                    $invalid[] = DependencyError::new($rule, "dependency on self");
+                    $invalid[] = Dependency_Error::new($rule, "dependency on self");
                 } else if (array_key_exists($dep, $this->dependences) && in_array($rule, $this->dependences[$dep])) {
-                    $invalid[] = DependencyError::new($rule, "circular denendency for '{$dep}'");
+                    $invalid[] = Dependency_Error::new($rule, "circular denendency for '{$dep}'");
                 }
             }
         }
