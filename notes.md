@@ -12,6 +12,8 @@
 - HTMX (js)
 - Firebase JWT (php)
 
+- Яндекс карты: https://yandex.ru/legal/maps_api/
+
 # Вариант
 
 Номер: 17

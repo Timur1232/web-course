@@ -1,5 +1,5 @@
 <?php namespace App;
-use App\Config;
+use \Config;
 use App\Core\Model\AR_Reflect;
 use App\Core\Model\DB_Model;
 use App\Models\Common_Sql;

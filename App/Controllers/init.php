@@ -3,4 +3,6 @@
     'products',
     'user_actions',
     'cart',
+    'feedback',
+    'map',
 ]);

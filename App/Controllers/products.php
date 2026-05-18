@@ -6,7 +6,7 @@ use App\Core\Model\DB_Model;
 use App\Core\Locale;
 use App\Core\View\View;
 use App\Views\Common_View;
-use App\Views\Products as ProductsView;
+use App\Views\Products as Products_View;
 use \App\Core\Helpers\Paginator;
 
 final class Products {
@@ -55,9 +55,9 @@ final class Products {
         $cart_ids = array_keys($_SESSION['cart'] ?? []);
 
         $content = View::func(function () use ($categories, $category_id, $current_page_items, $page, $total_pages, $base_url, $cart_ids) {
-            $left = ProductsView::category_panel($categories, $category_id)->render();
-            $grid = ProductsView::product_grid($current_page_items, $cart_ids)->render();
-            $pagination = ProductsView::pagination($page, $total_pages, $base_url)->render();
+            $left = Products_View::category_panel($categories, $category_id)->render();
+            $grid = Products_View::product_grid($current_page_items, $cart_ids)->render();
+            $pagination = Products_View::pagination($page, $total_pages, $base_url)->render();
             return <<<HTML
                 <div class="catalog-layout">
                     <aside class="catalog-sidebar">{$left}</aside>
@@ -81,6 +81,7 @@ final class Products {
     public static function show(Request $req): Response {
         $lang = Locale::get_language();
         $id = (int)$req->binds['id'];
+        $user = $req->additional['user'] ?? null;
 
         $stmt = DB_Model::query("
             select p.id, pt.name, pt.description, p.price
@@ -97,19 +98,58 @@ final class Products {
             select image_url from product_images where product_id = :id order by number asc
             ")?->bind_values(['id' => $id])?->execute()?->fetch_all() ?: [];
 
+        $reviews_rows = DB_Model::query("
+            SELECT author_name, rating, date, text
+            FROM reviews
+            WHERE product_id = :id
+            ORDER BY date DESC
+            ")?->bind_values(['id' => $id])?->execute()?->fetch_all() ?: [];
+        $reviews = array_map(fn($r) => (object)$r, $reviews_rows);
+
+        $avg_row = DB_Model::query("
+            SELECT AVG(rating) as avg_rating FROM reviews WHERE product_id = :id
+            ")?->bind_values(['id' => $id])?->execute()?->fetch();
+        $avg_rating = $avg_row ? round((float)($avg_row['avg_rating'] ?? 0), 1) : null;
+
         $product = (object)$row;
         $product->images = array_map(fn($r) => (object)$r, $images);
 
         $cart_ids = array_keys($_SESSION['cart'] ?? []);
-        $content = ProductsView::product_detail($product, $cart_ids);
+        $content = Products_View::product_detail($product, $cart_ids, $user, $reviews, $avg_rating);
 
-        $user = $req->additional['user'] ?? null;
         return Response::view(Common_View::layout(
             $content,
             title: $product->name,
             page_name: 'products',
             user: $user
         ));
+    }
+
+    public static function add_review(Request $req): Response {
+        $user = $req->additional['user'] ?? null;
+        if (!$user) {
+            $redirect = urlencode($req->url->path);
+            return Response::redirect('/login?redirect=' . $redirect);
+        }
+
+        $id = (int)$req->binds['id'];
+        $rating = (int)($req->form['rating'] ?? 0);
+        $text = trim($req->form['text'] ?? '');
+
+        if ($rating < 1 || $rating > 5 || empty($text)) {
+            return Response::redirect("/products/{$id}#reviews");
+        }
+
+        DB_Model::query("insert into reviews (product_id, author_name, text, rating) values (:pid, :author, :text, :rating)")
+            ?->bind_values([
+                'pid' => $id,
+                'author' => $user->login,
+                'text' => $text,
+                'rating' => $rating,
+            ])
+            ?->execute();
+
+        return Response::redirect("/products/{$id}#reviews");
     }
 }
 

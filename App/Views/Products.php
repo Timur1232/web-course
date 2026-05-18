@@ -3,6 +3,7 @@
 use App\Core\View\Component;
 use App\Core\View\View;
 use App\Core\Locale;
+use App\Models\User;
 
 final class Products {
     public static function category_panel(array $categories, ?int $active_id = null): Component {
@@ -79,8 +80,8 @@ final class Products {
         });
     }
 
-    public static function product_detail(object $product, array $cart_ids = []): Component {
-        return View::func(function () use ($product, $cart_ids) {
+    public static function product_detail(object $product, array $cart_ids = [], ?User $user = null, array $reviews = [], ?float $avg_rating = null): Component {
+        return View::func(function () use ($product, $cart_ids, $user, $reviews, $avg_rating) {
             $__ = fn($key) => Locale::get("products.{$key}");
             $img_first = htmlspecialchars($product->images[0]->image_url ?? '/public/media/placeholder.png');
             $name = htmlspecialchars($product->name);
@@ -99,7 +100,7 @@ final class Products {
                 ? '<button class="product-card-added" disabled>' . $__('added') . '</button>'
                 : "<button class=\"product-card-add\" hx-post=\"/cart/add\" hx-vals='{\"product_id\":{$id}}' hx-swap=\"outerHTML\">{$__('add_to_cart')}</button>";
 
-            return <<<HTML
+            $html = <<<HTML
                 <div class="product-detail">
                     <a href="/products" class="back-link">{$__('back_to_catalog')}</a>
                     <div class="product-detail-main">
@@ -117,6 +118,80 @@ final class Products {
                             {$button}
                         </div>
                     </div>
+                </div>
+                HTML;
+            $html .= self::reviews_section($product->id, $reviews, $avg_rating, $user)->render();
+            return $html;
+        });
+    }
+
+    public static function reviews_section(int $product_id, array $reviews, ?float $avg, ?User $user = null): Component {
+        return View::func(function () use ($product_id, $reviews, $avg, $user) {
+            $__ = fn($key) => Locale::get("reviews.{$key}");
+            $html = '<div class="reviews-section" id="reviews">';
+            $html .= '<h3>' . htmlspecialchars($__('reviews_title')) . '</h3>';
+
+            if (is_null($avg)) {
+                $html .= '<p class="no-reviews">' . htmlspecialchars($__('no_reviews')) . '</p>';
+            } else {
+                $html .= '<p class="average-rating">' . htmlspecialchars($__('average_rating')) . ': ' . number_format($avg, 1) . ' ' . htmlspecialchars($__('out_of_5')) . '</p>';
+            }
+
+            if ($user) {
+                $html .= self::review_form($product_id)->render();
+            } else {
+                $redirect = urlencode("/products/{$product_id}#reviews");
+                $html .= '<a href="/login?redirect=' . $redirect . '" class="login-to-review">' . htmlspecialchars($__('login_to_review')) . '</a>';
+            }
+
+            foreach ($reviews as $r) {
+                $html .= self::review_item($r)->render();
+            }
+
+
+            $html .= '</div>';
+            return $html;
+        });
+    }
+
+    public static function review_item(object $review): Component {
+        return View::func(function () use ($review) {
+            $author = htmlspecialchars($review->author_name);
+            $rating = (int)$review->rating;
+            $date = htmlspecialchars($review->date);
+            $text = nl2br(htmlspecialchars($review->text));
+            return <<<HTML
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-author">{$author}</span>
+                        <span class="review-rating">{$rating}/5</span>
+                        <span class="review-date">{$date}</span>
+                    </div>
+                    <div class="review-text">{$text}</div>
+                </div>
+                HTML;
+        });
+    }
+
+    public static function review_form(int $product_id): Component {
+        return View::func(function () use ($product_id) {
+            $__ = fn($key) => Locale::get("reviews.{$key}");
+            return <<<HTML
+                <div class="review-form">
+                    <h4>{$__('leave_review')}</h4>
+                    <form method="post" action="/products/{$product_id}/review">
+                        <label>{$__('rating')}</label>
+                        <select name="rating" required>
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                        </select>
+                        <label>{$__('your_review')}</label>
+                        <textarea name="text" rows="4" required></textarea>
+                        <button type="submit" class="review-submit">{$__('submit_review')}</button>
+                    </form>
                 </div>
                 HTML;
         });

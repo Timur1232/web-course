@@ -23,6 +23,7 @@ use App\Middleware\Get_User;
 use App\Middleware\Set_Language;
 use \App\Controllers\User_Actions;
 use \App\Controllers\Cart;
+use \App\Controllers\Feedback;
 
 DB_Model::sqlite_connect('test.db');
 Router::setup_current_request();
@@ -34,6 +35,7 @@ Router::$global_middleware = [
 Router::GET('/', Products::index(...));
 Router::GET('/products', Products::index(...));
 Router::GET('/products/:id', Products::show(...));
+Router::POST('/products/:id/review', Products::add_review(...));
 
 Router::GET('/cart', Cart::index(...));
 Router::POST('/cart/add', Cart::add(...));
@@ -46,5 +48,10 @@ Router::POST('/login', User_Actions::login_post(...));
 Router::POST('/logout', User_Actions::logout(...));
 Router::GET('/register', User_Actions::register_form(...));
 Router::POST('/register', User_Actions::register_post(...));
+
+Router::GET('/feedback', Feedback::index(...));
+Router::POST('/feedback', Feedback::send(...));
+
+Router::GET('/map', \App\Controllers\Map::index(...));
 
 

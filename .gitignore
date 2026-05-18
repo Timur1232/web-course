@@ -2,3 +2,4 @@ vendor/
 nob
 nob.old
 *.lock
+[Cc]onfig.*

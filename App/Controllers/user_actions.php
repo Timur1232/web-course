@@ -20,7 +20,7 @@ final class User_Actions {
         if ($user) {
             return Response::redirect('/');
         }
-        $current_path = $req->url->path;
+        $current_path = urldecode($req->url->query['redirect']) ?? '/';
         return Response::view(Common_View::layout(
             \App\Views\User_Actions::login_form($current_path),
             title: Locale::get('user_actions.login_title'),
@@ -93,7 +93,7 @@ final class User_Actions {
         if ($user) {
             return Response::redirect('/');
         }
-        $current_path = $req->url->path;
+        $current_path = urldecode($req->url->query['redirect']) ?? '/';
         return Response::view(Common_View::layout(
             \App\Views\User_Actions::register_form($current_path),
             title: Locale::get('user_actions.register_title'),

@@ -1,6 +1,5 @@
 <?php namespace App\Core\Context;
 use App\Core\Helpers\Error;
-use App\Core\Helpers\Helpers;
 use App\Core\Helpers\Log;
 use App\Core\Middleware;
 use App\Core\View\Component;
