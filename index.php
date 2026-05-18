@@ -24,6 +24,9 @@ use App\Middleware\Set_Language;
 use \App\Controllers\User_Actions;
 use \App\Controllers\Cart;
 use \App\Controllers\Feedback;
+use App\Core\Context\Request;
+use App\Core\Context\Response;
+use App\Core\View\View;
 
 DB_Model::sqlite_connect('test.db');
 Router::setup_current_request();
@@ -54,4 +57,14 @@ Router::POST('/feedback', Feedback::send(...));
 
 Router::GET('/map', \App\Controllers\Map::index(...));
 
+Router::GET('/about', \App\Controllers\Static_Pages::about(...));
+Router::GET('/about/edit', \App\Controllers\Static_Pages::about_edit(...));
+Router::POST('/about/save', \App\Controllers\Static_Pages::about_save(...));
+
+Router::GET('/test', function (Request $req) {
+    return Response::view(View::template('test'));
+});
+Router::POST('/test', function (Request $req) {
+    return Response::view(View::string($req->form['text']));
+});
 

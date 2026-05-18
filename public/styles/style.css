@@ -6,7 +6,7 @@
 */
 
 html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
 small, strike, strong, sub, sup, tt, var,
@@ -723,3 +723,18 @@ footer {
     color: green;
 }
 
+
+/* О нас */
+.about-wrapper {
+    padding: 10px;
+}
+.edit-page-button {
+    background: var(--color-gold);
+    color: var(--color-black);
+    border: 1px solid var(--color-gold-dark);
+    padding: 6px 14px;
+    margin-bottom: 30px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}

@@ -32,7 +32,7 @@ final class Component_Func implements Component {
 
 final class Template_Component implements Component {
 
-    public static string $template_prefix = 'App/Templates/';
+    public static string $template_prefix = '';
 
     /*
     * @param array<string, mixed> $data

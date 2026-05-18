@@ -5,4 +5,5 @@
     'cart',
     'feedback',
     'map',
+    'static_pages',
 ]);
