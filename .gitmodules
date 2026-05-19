@@ -1,0 +1,3 @@
+[submodule "docs/typst_templates"]
+	path = docs/typst_templates
+	url = https://github.com/Timur1232/typst_templates
