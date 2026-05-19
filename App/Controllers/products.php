@@ -2,6 +2,7 @@
 
 use App\Core\Context\Request;
 use App\Core\Context\Response;
+use App\Core\Helpers\Helpers;
 use App\Core\Helpers\Log;
 use App\Core\Model\DB_Model;
 use App\Core\Locale;
@@ -348,6 +349,30 @@ final class Products {
         }
         $id = (int)$id;
 
+        $images_url = DB_Model::query('select image_url from product_images where product_id = :id')
+            ?->bind_values(['id' => $id])
+            ?->execute()
+            ?->fetch_all();
+        Log::trace(print_r($images_url, true));
+        if (!is_null($images_url)) {
+            foreach ($images_url as $img_url) {
+                $img_url = '.' . $img_url['image_url'];
+                if (!str_starts_with($img_url, './public/product_images')) {
+                    Log::warning(__METHOD__.": Invalid image placement: $img_url");
+                    continue;
+                }
+                if (!file_exists($img_url)) {
+                    Log::warning(__METHOD__.": File no exists: $img_url");
+                    continue;
+                }
+                if (!unlink($img_url)) {
+                    Log::warning(__METHOD__.": Unable to delete image: $img_url");
+                } else {
+                    Log::info(__METHOD__.": Image successfuly deleted: $img_url");
+                }
+            }
+        }
+
         if (\Config::IS_USING_SQLITE) {
             DB_Model::query('pragma foreign_keys = on')?->execute();
         }
@@ -358,29 +383,7 @@ final class Products {
             return Response::redirect('/');
         }
 
-        $images_url = DB_Model::query('select image_url from product_images where product_id = :id')
-            ?->bind_values(['id' => $id])
-            ?->execute()
-            ?->fetch_all();
-        if (!is_null($images_url)) {
-            foreach ($images_url as $img_url) {
-                $img_url = '.' . $img_url;
-                if (str_starts_with('./public/product_images', $img_url) && file_exists($img_url)) {
-                    unlink($img_url);
-                } else {
-                    Log::warning(__METHOD__.": Invalid image placement: $img_url");
-                }
-            }
-        }
-
-        if (\Config::IS_USING_SQLITE) {
-            DB_Model::query('pragma foreign_keys = on')?->execute();
-        }
-        DB_Model::query('delete from product_images where product_id = :id')
-            ?->bind_values(['id' => $id])
-            ?->execute();
-
-        return Response::redirect('/');
+        return Response::redirect('/products');
     }
 }
 

@@ -162,15 +162,31 @@ int main(int argc, char** argv)
         }
 
         {
-            const char* root_dir = "./";
+            const char* index_file = "./index.php";
             int fd = inotify_init1(O_NONBLOCK);
             if (fd == -1) {
-                nob_log(NOB_ERROR, "Unable to init inotify for %s", root_dir);
+                nob_log(NOB_ERROR, "Unable to init inotify for %s", index_file);
                 return false;
             }
-            int wd = inotify_add_watch(fd, root_dir, IN_MODIFY | IN_CREATE | IN_DELETE | IN_ONLYDIR);
+            int wd = inotify_add_watch(fd, index_file, IN_MODIFY | IN_CREATE | IN_DELETE);
             if (wd == -1) {
-                nob_log(NOB_ERROR, "Unable to add watch %s directory", root_dir);
+                nob_log(NOB_ERROR, "Unable to add watch on %s", index_file);
+                close(fd);
+                return false;
+            }
+            da_append(&w, ((Watch) {
+                .fd = fd,
+                .wd = wd,
+            }));
+            const char* init_file = "./init.php";
+            fd = inotify_init1(O_NONBLOCK);
+            if (fd == -1) {
+                nob_log(NOB_ERROR, "Unable to init inotify for %s", init_file);
+                return false;
+            }
+            wd = inotify_add_watch(fd, init_file, IN_MODIFY | IN_CREATE | IN_DELETE);
+            if (wd == -1) {
+                nob_log(NOB_ERROR, "Unable to add watch on %s", init_file);
                 close(fd);
                 return false;
             }
