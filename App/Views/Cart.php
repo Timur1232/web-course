@@ -59,37 +59,35 @@ final class Cart {
             $__ = fn($key) => Locale::get("cart.{$key}");
             $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
             return <<<HTML
-            <div class="checkout-form">
-                <h3>{$__('checkout_title')}</h3>
+            <form class="form" method="post" action="/cart/checkout" id="checkout-form">
+                <h3 class="form-title">{$__('checkout_title')}</h3>
                 {$error_html}
-                <form method="post" action="/cart/checkout" id="checkout-form">
-                    <label>{$__('customer_name')}</label>
-                    <input type="text" name="customer_name" required>
-                    <label>{$__('phone')}</label>
-                    <input type="tel" name="phone" required>
-                    <label>{$__('email')}</label>
-                    <input type="email" name="email" required>
+                <label>{$__('customer_name')}</label>
+                <input type="text" name="customer_name" required>
+                <label>{$__('phone')}</label>
+                <input type="tel" name="phone" required>
+                <label>{$__('email')}</label>
+                <input type="email" name="email" required>
 
-                    <label>{$__('payment_method')}</label>
-                    <select name="payment_method">
-                        <option value="card">Карта</option>
-                        <option value="cash">Наличные</option>
-                    </select>
+                <label>{$__('payment_method')}</label>
+                <select name="payment_method">
+                    <option value="card">Карта</option>
+                    <option value="cash">Наличные</option>
+                </select>
 
-                    <label>{$__('delivery_method')}</label>
-                    <select name="delivery_method" id="delivery-method" onchange="document.getElementById('address-field').style.display = this.value === 'delivery' ? 'block' : 'none'">
-                        <option value="pickup">{$__('pickup')}</option>
-                        <option value="delivery">{$__('delivery')}</option>
-                    </select>
+                <label>{$__('delivery_method')}</label>
+                <select name="delivery_method" id="delivery-method" onchange="document.getElementById('address-field').style.display = this.value === 'delivery' ? 'block' : 'none'">
+                    <option value="pickup">{$__('pickup')}</option>
+                    <option value="delivery">{$__('delivery')}</option>
+                </select>
 
-                    <div id="address-field" style="display:none;">
-                        <label>{$__('address')}</label>
-                        <input type="text" name="delivery_address">
-                    </div>
+                <div id="address-field" style="display:none;">
+                    <label>{$__('address')}</label>
+                    <input type="text" name="delivery_address">
+                </div>
 
-                    <button type="submit" class="checkout-submit">{$__('submit_order')}</button>
-                </form>
-            </div>
+                <button type="submit" class="form-submit">{$__('submit_order')}</button>
+            </form>
             HTML;
         });
     }

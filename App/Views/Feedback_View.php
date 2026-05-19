@@ -10,20 +10,18 @@ final class Feedback_View {
             $__ = fn($key) => Locale::get("feedback.{$key}");
             $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
             return <<<HTML
-            <div class="feedback-form">
-                <h2>{$__('title')}</h2>
-                <p>{$__('description')}</p>
-                {$error_html}
-                <form method="post" action="/feedback">
+                <form class="form form-narrow" method="post" action="/feedback">
+                    <h2 class="form-title">{$__('title')}</h2>
+                    <p class="form-desctription">{$__('description')}</p>
+                    {$error_html}
                     <label>{$__('name')}</label>
                     <input type="text" name="name" required>
                     <label>{$__('email')}</label>
                     <input type="email" name="email" required>
                     <label>{$__('message')}</label>
                     <textarea name="message" rows="6" required></textarea>
-                    <button type="submit">{$__('submit')}</button>
+                    <button type="submit" class="form-submit">{$__('submit')}</button>
                 </form>
-            </div>
             HTML;
         });
     }

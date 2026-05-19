@@ -133,7 +133,7 @@ final class Router {
             $comp = $response->apply();
             echo $comp->render();
         } catch (Throwable $e) {
-            Log::error(__METHOD__.': '.$e->getMessage());
+            Log::error(__METHOD__.': '.$e->getMessage()."\n".$e->getTraceAsString());
             http_response_code(500);
             header('HX-Retarget: body');
             header('HX-Reswap: innerHTML');

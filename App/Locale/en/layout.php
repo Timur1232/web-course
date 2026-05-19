@@ -11,7 +11,8 @@ return [
     'menu.news' => 'News',
     'menu.promotions' => 'Promotions',
     'menu.feedback' => 'Feedback',
-    'menu.sitemap' => 'Sitemap',
+    'menu.site_scheme' => 'Sitemap',
     'menu.map' => 'Directions',
+    'menu.admin' => 'Admin',
     'footer' => '© {{year}} MUSIC WORLD. All rights reserved.',
 ];

@@ -11,6 +11,7 @@ create table if not exists user_privileges (
     primary key (user_login, privilege_name),
     foreign key (user_login) references users(login)
         on delete cascade
+        on update cascade
 );
 
 create table if not exists news (
@@ -24,20 +25,18 @@ create table if not exists news (
 create table if not exists news_translations (
     news_id integer not null,
     lang_code varchar(10) not null,
-    title varchar(200) not null,
+    title varchar(100) not null,
+    preview varchar(100) not null,
     content text,
 
     primary key (news_id, lang_code),
     foreign key (news_id) references news(id)
         on delete cascade
+        on update cascade
 );
 
 create table if not exists categories (
     id integer primary key,
-    parent_id integer default null,
-
-    foreign key (parent_id) references categories(id)
-        on delete cascade
 );
 
 create table if not exists category_translations (
@@ -48,15 +47,18 @@ create table if not exists category_translations (
     primary key (category_id, lang_code),
     foreign key (category_id) references categories(id)
         on delete cascade
+        on update cascade
 );
 
 create table if not exists products (
     id integer primary key,
-    category_id integer not null,
+    category_id integer default null,
     price decimal(10,2) not null,
     visible boolean default true,
 
     foreign key (category_id) references categories(id)
+        on delete set null
+        on update cascade
 );
 
 create table if not exists product_translations (
@@ -68,6 +70,7 @@ create table if not exists product_translations (
     primary key (product_id, lang_code),
     foreign key (product_id) references products(id)
         on delete cascade
+        on update cascade
 );
 
 create table if not exists product_images (
@@ -78,6 +81,7 @@ create table if not exists product_images (
 
     foreign key (product_id) references products(id)
         on delete cascade
+        on update cascade
 );
 
 create table if not exists orders (
@@ -96,13 +100,16 @@ create table if not exists orders (
 create table if not exists ordered_products (
     id integer primary key,
     order_id integer not null,
-    product_id integer not null,
+    product_id integer,
     count integer not null,
     price decimal(10,2) not null,
 
     foreign key (order_id) references orders(id)
-        on delete cascade,
+        on delete cascade
+        on update cascade,
     foreign key (product_id) references products(id)
+        on delete cascade
+        on update cascade
 );
 
 create table if not exists reviews (

@@ -21,10 +21,10 @@ final class Cart {
             $ids = array_keys($cart);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $rows = DB_Model::query("
-                SELECT p.id, pt.name, p.price
-                FROM products p
-                JOIN product_translations pt ON p.id = pt.product_id AND pt.lang_code = ?
-                WHERE p.id IN ($placeholders) AND p.visible = 1
+                select p.id, pt.name, p.price
+                from products p
+                join product_translations pt on p.id = pt.product_id and pt.lang_code = ?
+                where p.id in ($placeholders) and p.visible = 1
                 ")?->bind_values(array_merge([$lang], $ids))?->execute()?->fetch_all() ?: [];
 
             foreach ($rows as $row) {
@@ -188,10 +188,10 @@ final class Cart {
             $ids = array_keys($cart);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $rows = DB_Model::query("
-                SELECT p.id, pt.name, p.price
-                FROM products p
-                JOIN product_translations pt ON p.id = pt.product_id AND pt.lang_code = ?
-                WHERE p.id IN ($placeholders) AND p.visible = 1
+                select p.id, pt.name, p.price
+                from products p
+                join product_translations pt on p.id = pt.product_id and pt.lang_code = ?
+                where p.id in ($placeholders) and p.visible = 1
                 ")?->bind_values(array_merge([$lang], $ids))?->execute()?->fetch_all() ?: [];
 
             foreach ($rows as $row) {

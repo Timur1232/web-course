@@ -93,6 +93,13 @@ final class Response {
         )->header('Content-Type', 'application/json; charset=utf-8');
     }
 
+    public static function not_found(): self {
+        return new self(
+            component: View::empty(),
+            status_code: 404,
+        );
+    }
+
     public static function redirect(string $url, int $code = 303): self {
         return new self(
             component: View::empty(),

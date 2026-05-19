@@ -11,7 +11,8 @@ return [
     'menu.news' => 'Новости',
     'menu.promotions' => 'Акции',
     'menu.feedback' => 'Обратная связь',
-    'menu.sitemap' => 'Карта сайта',
+    'menu.site_scheme' => 'Карта сайта',
     'menu.map' => 'Схема проезда',
+    'menu.admin' => 'Админ',
     'footer' => '© {{year}} MUSIC WORLD. Все права защищены.',
 ];

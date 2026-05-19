@@ -41,6 +41,7 @@ final class News_Translation {
         #[AR_Field('news_id')]   public ?int    $news_id   = null,
         #[AR_Field('lang_code')] public ?string $lang_code = null,
         #[AR_Field('title')]     public ?string $title     = null,
+        #[AR_Field('preview')]   public ?string $preview   = null,
         #[AR_Field('content')]   public ?string $content   = null,
     ) {}
 }

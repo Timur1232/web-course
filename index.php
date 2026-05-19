@@ -16,6 +16,7 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+use App\Controllers\Admin;
 use App\Controllers\Products;
 use App\Core\Context\Router;
 use App\Core\Model\DB_Model;
@@ -27,6 +28,10 @@ use \App\Controllers\Feedback;
 use App\Core\Context\Request;
 use App\Core\Context\Response;
 use App\Core\View\View;
+use \App\Controllers\News;
+use \App\Controllers\Static_Pages;
+use \App\Controllers\Promotions;
+use \App\Controllers\Categories;
 
 DB_Model::sqlite_connect('test.db');
 Router::setup_current_request();
@@ -37,6 +42,17 @@ Router::$global_middleware = [
 
 Router::GET('/', Products::index(...));
 Router::GET('/products', Products::index(...));
+Router::GET('/products/search', Products::index(...));
+
+Router::GET('/products/add_category', Categories::add_form(...));
+Router::POST('/products/add_category', Categories::create(...));
+Router::GET('/products/edit_category/:id', Categories::edit_form(...));
+Router::POST('/products/edit_category/:id', Categories::update(...));
+Router::GET('/products/delete_category/:id', Categories::delete(...));
+
+Router::GET('/products/add_product', Products::add_form(...));
+Router::POST('/products/add_product', Products::create(...));
+
 Router::GET('/products/:id', Products::show(...));
 Router::POST('/products/:id/review', Products::add_review(...));
 
@@ -57,9 +73,33 @@ Router::POST('/feedback', Feedback::send(...));
 
 Router::GET('/map', \App\Controllers\Map::index(...));
 
-Router::GET('/about', \App\Controllers\Static_Pages::about(...));
-Router::GET('/about/edit', \App\Controllers\Static_Pages::about_edit(...));
-Router::POST('/about/save', \App\Controllers\Static_Pages::about_save(...));
+Router::GET('/about', Static_Pages::about(...));
+Router::GET('/about/edit', Static_Pages::about_edit(...));
+Router::POST('/about/save', Static_Pages::about_save(...));
+
+Router::GET('/site_scheme', Static_Pages::site_scheme(...));
+Router::GET('/site_scheme/edit', Static_Pages::site_scheme_edit(...));
+Router::POST('/site_scheme/save', Static_Pages::site_scheme_save(...));
+
+Router::GET('/news', News::index(...));
+Router::GET('/news/new', News::new(...));
+Router::POST('/news/new', News::create(...));
+Router::GET('/news/:id', News::show(...));
+Router::GET('/news/:id/edit', News::edit(...));
+Router::POST('/news/:id/edit', News::update(...));
+Router::POST('/news/:id/delete', News::delete(...));
+
+Router::GET('/promotions', Promotions::index(...));
+Router::GET('/promotions/new', Promotions::new(...));
+Router::POST('/promotions/new', Promotions::create(...));
+Router::GET('/promotions/:id', Promotions::show(...));
+Router::GET('/promotions/:id/edit', Promotions::edit(...));
+Router::POST('/promotions/:id/edit', Promotions::update(...));
+Router::POST('/promotions/:id/delete', Promotions::delete(...));
+
+Router::GET('/admin', Admin::index(...));
+Router::POST('/admin/users/update', Admin::update(...));
+Router::POST('/admin/users/delete', Admin::delete(...));
 
 Router::GET('/test', function (Request $req) {
     return Response::view(View::template('test'));

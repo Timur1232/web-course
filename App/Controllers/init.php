@@ -6,4 +6,8 @@
     'feedback',
     'map',
     'static_pages',
+    'news',
+    'promotions',
+    'category',
+    'admin',
 ]);

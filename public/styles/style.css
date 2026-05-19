@@ -49,7 +49,7 @@ table {
     border-spacing: 0;
 }
 
-/* ======================= My CSS ======================= */
+/* ======================= Layout ======================= */
 
 :root {
     --color-white: #f8f5f0;
@@ -234,7 +234,148 @@ footer {
     font-size: 14px;
 }
 
+/* ==========================[Common]========================== */
 
+/*
+* Общие формы
+*
+* USAGE
+*   <form class="form" method="post" action="/some/url">
+*       <h3 class="form-title">Заголовок</h3>
+*       <p class="form-description">Описание</p>
+*       <div class="form-error">Ошибка</div>
+*       <label>Имя</label>
+*       <input type="text" name="name">
+*       <label>Email</label>
+*       <input type="email" name="email">
+*       <label>Сообщение</label>
+*       <textarea name="message"></textarea>
+*       <button type="submit" class="form-submit">Отправить</button>
+*       <a href="/news" class="form-cancel">Отмена</a>
+*   </form>
+*/
+.form {
+    margin: 0 auto;
+}
+.form.form-narrow {
+    max-width: 600px;
+}
+.form-title {
+    margin-bottom: 10px;
+}
+.form-description {
+    margin-bottom: 20px;
+    color: #555;
+}
+.form label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-weight: normal;
+}
+.form input,
+.form select,
+.form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: inherit;
+    font-family: inherit;
+}
+.form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+    outline: none;
+    border-color: var(--color-gold);
+}
+.form-submit {
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: var(--color-gold);
+    border: 1px solid var(--color-gold-dark);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+.form-submit:hover {
+    background: var(--color-gold-light);
+}
+.form-cancel {
+    display: inline-block;
+    padding: 10px 24px;
+    margin-top: 20px;
+    margin-left: 10px;
+    background: var(--color-white);
+    border: 1px solid var(--color-gold-dark);
+    color: var(--color-text);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+.form-cancel:hover {
+    background: #f0f0f0;
+}
+.form-error {
+    background: #ffe8e8;
+    color: #b00020;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/*
+* Ссылка возврата
+*
+* USAGE
+* <a href="/path" class="back-link">Назад к списку</a>
+*/
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: var(--color-gold-dark);
+    text-decoration: none;
+}
+.back-link::before {
+    content: '← ';
+    display: inline;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/*
+* Управлени админом
+*
+* USAGE
+* <a href="/path/urmom/add" class="admin-add-btn">Добавить</a>
+* <a href="/path/urmom/edit" class="admin-edit-btn">Редактировать</a>
+* <a href="/path/urmom/delete" class="admin-delete-btn">Удалить</a>
+*/
+.admin-add-btn,
+.admin-edit-btn,
+.admin-delete-btn {
+    background: var(--color-gold-dark);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 10px;
+}
+.admin-delete-btn {
+    background: #b00020;
+}
+
+/* ==========================[Special]========================== */
+
+/* Auth */
 .auth-form {
     max-width: 400px;
     margin: 40px auto;
@@ -334,19 +475,31 @@ footer {
 .categories-panel li {
     margin-bottom: 6px;
 }
-.categories-panel a {
+.categories-panel-link {
     display: block;
     padding: 6px 8px;
     text-decoration: none;
     color: var(--color-text);
     transition: background 0.2s;
 }
-.categories-panel a.active,
-.categories-panel a:hover {
+.categories-panel-link.active,
+.categories-panel-link:hover {
     background: var(--color-gold-light);
     color: var(--color-black);
     font-weight: 500;
 }
+.categories-panel-link-with-controls {
+    display: flex;
+    gap-row: 2px;
+}
+.categories-panel-link {
+    flex-grow: 3;
+}
+.categories-panel-link-with-controls .categories-panel-link ~ a {
+    padding: 6px 4px;
+}
+
+
 /* Сетка товаров */
 .product-grid {
     display: grid;
@@ -444,15 +597,6 @@ footer {
 /* Детальная страница */
 .product-detail {
     padding: 10px 0;
-}
-.back-link {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: var(--color-gold-dark);
-    text-decoration: none;
-}
-.back-link:hover {
-    text-decoration: underline;
 }
 .product-detail-main {
     display: flex;
@@ -569,35 +713,6 @@ footer {
     font-weight: bold;
     margin: 20px 0;
 }
-.checkout-form {
-    margin-top: 30px;
-}
-.checkout-form h3 {
-    font-size: 20px;
-    margin-bottom: 15px;
-}
-.checkout-form label {
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 4px;
-}
-.checkout-form input[type="text"],
-.checkout-form input[type="tel"],
-.checkout-form input[type="email"],
-.checkout-form select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-}
-.checkout-form .checkout-submit {
-    margin-top: 20px;
-    padding: 10px 24px;
-    background: var(--color-gold);
-    border: 1px solid var(--color-gold-dark);
-    cursor: pointer;
-    font-weight: bold;
-}
 .order-success {
     text-align: center;
     font-size: 18px;
@@ -654,28 +769,6 @@ footer {
     padding: 15px;
     border: 1px solid #e0d8c8;
 }
-.review-form h4 {
-    margin-bottom: 10px;
-}
-.review-form label {
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 4px;
-}
-.review-form select,
-.review-form textarea {
-    width: 100%;
-    padding: 6px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-}
-.review-form .review-submit {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background: var(--color-gold);
-    border: 1px solid var(--color-gold-dark);
-    cursor: pointer;
-}
 .login-to-review {
     display: inline-block;
     margin-top: 15px;
@@ -685,37 +778,6 @@ footer {
 
 
 /* Обратная связь */
-.feedback-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
-.feedback-form h2 {
-    margin-bottom: 10px;
-}
-.feedback-form p {
-    margin-bottom: 20px;
-    color: #555;
-}
-.feedback-form label {
-    display: block;
-    margin-top: 12px;
-    margin-bottom: 4px;
-}
-.feedback-form input,
-.feedback-form textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-}
-.feedback-form button {
-    margin-top: 20px;
-    padding: 10px 24px;
-    background: var(--color-gold);
-    border: 1px solid var(--color-gold-dark);
-    cursor: pointer;
-    font-weight: bold;
-}
 .feedback-thanks {
     text-align: center;
     font-size: 18px;
@@ -737,4 +799,127 @@ footer {
     cursor: pointer;
     font-weight: 500;
     transition: background 0.2s;
+}
+
+
+/* Новости */
+.news-list h2 {
+    margin-bottom: 15px;
+}
+.news-item {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0d8c8;
+    padding-bottom: 15px;
+}
+.news-item h3 a {
+    text-decoration: none;
+    color: var(--color-gold-dark);
+}
+.news-date {
+    color: #888;
+    font-size: 14px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+.news-preview {
+    margin-top: 5px;
+}
+.back-link {
+    display: inline-block;
+    margin-bottom: 15px;
+    color: var(--color-gold-dark);
+    text-decoration: none;
+}
+.news-detail .news-date {
+    display: block;
+    margin-bottom: 20px;
+}
+.news-content {
+    line-height: 1.5;
+}
+.news-admin-actions {
+    margin-bottom: 15px;
+}
+
+
+/* Акции */
+.promotions-list h2,
+.promotion-detail h2 { margin-bottom: 15px; }
+.promotion-item {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0d8c8;
+    padding-bottom: 15px;
+}
+.promotion-item h3 a {
+    text-decoration: none;
+    color: var(--color-gold-dark);
+}
+.promotion-date {
+    color: #888;
+    font-size: 14px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+.promotion-preview {
+    margin-top: 5px;
+}
+.promotion-detail .promotion-date {
+    display: block;
+    margin-bottom: 20px;
+}
+.promotion-content {
+    line-height: 1.5;
+}
+.promotion-admin-actions {
+    margin-bottom: 15px;
+}
+
+
+/* Список пользователей */
+.user-list-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0d8c8;
+}
+.user-list-item-login {
+    flex: 1;
+    font-weight: 500;
+    min-width: 150px;
+}
+.user-privilege-form select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background: var(--color-white);
+    font: inherit;
+    cursor: pointer;
+}
+.user-privilege-form select:focus {
+    border-color: var(--color-gold);
+    outline: none;
+}
+.user-delete-form .delete-btn {
+    background: none;
+    border: none;
+    color: #b00020;
+    font-size: 18px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+.user-delete-form .delete-btn:hover {
+    color: #ff0000;
+}
+
+
+.site-scheme-wrapper {
+    padding: 10px;
+}
+.site-scheme {
+    list-style: disc;
+}
+.site-scheme li {
+    padding: 3px;
 }

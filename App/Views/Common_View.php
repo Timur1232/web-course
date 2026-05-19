@@ -2,6 +2,7 @@
 use App\Core\View\Component;
 use App\Core\View\View;
 use App\Models\User;
+use App\Models\User_Privileges;
 
 final class Common_View {
     /**
@@ -62,10 +63,12 @@ final class Common_View {
                         <div class="header-inner">
                             <div class="header-top">
                                 <a href="/" class="logo"><?= htmlspecialchars($__('logo')) ?></a>
-                                <div class="search-bar">
-                                    <input type="text" placeholder="<?= htmlspecialchars($__('search_placeholder')) ?>">
-                                    <button disabled><?= htmlspecialchars($__('search_button')) ?></button>
-                                </div>
+                                <form action="/products/search" method="get">
+                                    <div class="search-bar">
+                                        <input type="text" name="search" placeholder="<?= htmlspecialchars($__('search_placeholder')) ?>">
+                                        <button type="submit"><?= htmlspecialchars($__('search_button')) ?></button>
+                                    </div>
+                                </form>
                                 <a href="/cart" class="cart-button"><?= htmlspecialchars($__('cart')) ?></a>
                                 <span id="cart-count" class="cart-count">
                                     <?= count($_SESSION['cart'] ?? []) ?: '' ?>
@@ -82,9 +85,10 @@ final class Common_View {
                                     <?php else: ?>
                                     <span class="user-login"><?= htmlspecialchars($user->login) ?></span>
                                     <a href="#" class="logout-button"
-                                        hx-post="/logout"
-                                        hx-target="#user-actions"
-                                        hx-swap="innerHTML"><?= htmlspecialchars($__('logout')) ?></a>
+                                        onclick="document.cookie='jwt_token=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';location.reload();"
+                                    >
+                                        <?= htmlspecialchars($__('logout')) ?>
+                                    </a>
                                     <?php endif ?>
                                 </div>
                             </div>
@@ -95,8 +99,11 @@ final class Common_View {
                                     <li><a href="/news" class="<?= $page_name === 'news' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.news')) ?></a></li>
                                     <li><a href="/promotions" class="<?= $page_name === 'promotions' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.promotions')) ?></a></li>
                                     <li><a href="/feedback" class="<?= $page_name === 'feedback' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.feedback')) ?></a></li>
-                                    <li><a href="/sitemap" class="<?= $page_name === 'sitemap' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.sitemap')) ?></a></li>
+                                    <li><a href="/site_scheme" class="<?= $page_name === 'site_scheme' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.site_scheme')) ?></a></li>
                                     <li><a href="/map" class="<?= $page_name === 'map' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.map')) ?></a></li>
+                                    <?php if ($user && $user->privilege === User_Privileges::ADMIN): ?>
+                                    <li><a href="/admin" class="<?= $page_name === 'admin' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.admin')) ?></a></li>
+                                    <?php endif ?>
                                 </ul>
                             </nav>
                         </div>
