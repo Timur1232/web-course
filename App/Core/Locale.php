@@ -21,7 +21,7 @@ final class Locale {
         if (count($parts) !== 2) {
             Error::assert(false, __METHOD__.": Invalid key format '{$key}'. Use 'file.key'.");
         }
-        [$file, $innerKey] = $parts;
+        [$file, $inner_key] = $parts;
 
         if (!isset(self::$loaded[self::$lang][$file])) {
             $path = "./App/Locale/" . self::$lang . "/{$file}.php";
@@ -32,7 +32,7 @@ final class Locale {
         }
 
         $dictionary = self::$loaded[self::$lang][$file];
-        $value = $dictionary[$innerKey] ?? $key;
+        $value = $dictionary[$inner_key] ?? $key;
 
         if (!empty($replace)) {
             foreach ($replace as $placeholder => $replacement) {

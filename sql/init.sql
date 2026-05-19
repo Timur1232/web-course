@@ -54,7 +54,6 @@ create table if not exists products (
     id integer primary key,
     category_id integer default null,
     price decimal(10,2) not null,
-    visible boolean default true,
 
     foreign key (category_id) references categories(id)
         on delete set null

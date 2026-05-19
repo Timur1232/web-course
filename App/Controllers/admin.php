@@ -76,6 +76,9 @@ final class Admin {
             return Response::redirect('/admin');
         }
 
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
         DB_Model::query('delete from users where login = :login')
             ?->bind_values(['login' => $login])
             ?->execute();

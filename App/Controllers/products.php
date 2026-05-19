@@ -2,6 +2,7 @@
 
 use App\Core\Context\Request;
 use App\Core\Context\Response;
+use App\Core\Helpers\Log;
 use App\Core\Model\DB_Model;
 use App\Core\Locale;
 use App\Core\View\View;
@@ -266,6 +267,120 @@ final class Products {
         }
 
         return Response::redirect('/products/' . $product_id);
+    }
+
+    public static function edit_form(Request $req): Response {
+        $user = self::require_admin($req);
+        if (is_null($user)) {
+            return Response::redirect('/login');
+        }
+
+        $id = $req->binds['id'] ?? null;
+        if (is_null($id) || !is_numeric($id)) {
+            return Response::redirect('/');
+        }
+        $id = (int)$id;
+
+        $product = DB_Model::query('
+            select id, category_id, price
+            from products
+            where id = :id
+            ')?->bind_values(['id' => $id])
+            ?->execute()
+            ?->fetch();
+        if (is_null($product)) {
+            return Response::redirect('/');
+        }
+
+        $ru = DB_Model::query('select name, description from product_translations where product_id = :id and lang_code = \'ru\'')
+            ?->bind_values(['id' => $id])
+            ?->execute()
+            ?->fetch();
+        if (is_null($ru)) {
+            return Response::redirect('/');
+        }
+
+        $en = DB_Model::query('select name, description from product_translations where product_id = :id and lang_code = \'en\'')
+            ?->bind_values(['id' => $id])
+            ?->execute()
+            ?->fetch();
+        if (is_null($en)) {
+            return Response::redirect('/');
+        }
+
+        $product['name_ru'] = $ru['name'];
+        $product['name_en'] = $en['name'];
+        $product['description_ru'] = $ru['description'];
+        $product['description_en'] = $en['description'];
+
+        $lang = Locale::get_language();
+        $cat_rows = DB_Model::query("
+            select c.id, ct.name
+            from categories c
+            join category_translations ct on c.id = ct.category_id and ct.lang_code = :lang
+            order by ct.name
+            ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?: [];
+        $categories = array_map(fn($r) => (object)$r, $cat_rows);
+
+        $comp = Products_View::edit_product_form((object)$product, $categories);
+        return Response::view(Common_View::layout(
+            $comp,
+            title: Locale::get('products.edit_product_title'),
+            page_name: 'products',
+            user: $user,
+            scripts: [
+                Js_Script::from('//code.jquery.com/jquery-3.6.0.min.js'),
+                Js_Script::from('//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'),
+                Js_Script::from('https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js'),
+            ]
+        ));
+    }
+
+    public static function delete(Request $req): Response {
+        $user = self::require_admin($req);
+        if (is_null($user)) {
+            return Response::redirect('/login');
+        }
+
+        $id = $req->binds['id'] ?? null;
+        if (is_null($id) || !is_numeric($id)) {
+            return Response::redirect('/');
+        }
+        $id = (int)$id;
+
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
+        $res = DB_Model::query('delete from products where id = :id')
+            ?->bind_values(['id' => $id])
+            ?->execute();
+        if (is_null($res)) {
+            return Response::redirect('/');
+        }
+
+        $images_url = DB_Model::query('select image_url from product_images where product_id = :id')
+            ?->bind_values(['id' => $id])
+            ?->execute()
+            ?->fetch_all();
+        if (!is_null($images_url)) {
+            foreach ($images_url as $img_url) {
+                $img_url = '.' . $img_url;
+                if (str_starts_with('./public/product_images', $img_url) && file_exists($img_url)) {
+                    unlink($img_url);
+                } else {
+                    Log::warning(__METHOD__.": Invalid image placement: $img_url");
+                }
+            }
+        }
+
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
+        DB_Model::query('delete from product_images where product_id = :id')
+            ?->bind_values(['id' => $id])
+            ?->execute();
+
+        return Response::redirect('/');
     }
 }
 

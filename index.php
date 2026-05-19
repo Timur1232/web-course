@@ -7,10 +7,6 @@ if (!defined('STDIN'))  define('STDIN',  fopen('php://stdin', 'rb'));
 if (!defined('STDOUT')) define('STDOUT', fopen('php://stdout', 'wb'));
 if (!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
 
-function __(string $key, array $replace = []): string {
-    return \App\Core\Locale::get($key, $replace);
-}
-
 session_start();
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -42,16 +38,17 @@ Router::$global_middleware = [
 
 Router::GET('/', Products::index(...));
 Router::GET('/products', Products::index(...));
+Router::POST('/products/delete/:id', Products::delete(...));
 Router::GET('/products/search', Products::index(...));
+
+Router::GET('/products/add', Products::add_form(...));
+Router::POST('/products/add', Products::create(...));
 
 Router::GET('/products/add_category', Categories::add_form(...));
 Router::POST('/products/add_category', Categories::create(...));
 Router::GET('/products/edit_category/:id', Categories::edit_form(...));
 Router::POST('/products/edit_category/:id', Categories::update(...));
 Router::GET('/products/delete_category/:id', Categories::delete(...));
-
-Router::GET('/products/add_product', Products::add_form(...));
-Router::POST('/products/add_product', Products::create(...));
 
 Router::GET('/products/:id', Products::show(...));
 Router::POST('/products/:id/review', Products::add_review(...));

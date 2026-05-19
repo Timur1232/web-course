@@ -12,6 +12,7 @@ return [
     'search_msg' => 'Поиск по "{{query}}"',
 
     'add_product_title' => 'Добавить товар',
+    'edit_product_title' => 'Редактировать товар',
     'field_name_ru' => 'Название (RU)',
     'field_name_en' => 'Название (EN)',
     'field_description_ru' => 'Описание (RU)',
@@ -22,4 +23,7 @@ return [
     'select_category' => 'Выберите категорию',
     'submit' => 'Сохранить',
     'add_product' => 'Добавить товар',
+
+    'edit_product' => 'Редактировать',
+    'delete_product' => 'Удалить',
 ];

@@ -208,7 +208,10 @@ final class Promotions {
         $user = self::require_admin($req);
         if (!$user) return Response::redirect('/');
         $id = (int)$req->binds['id'];
-        DB_Model::query("DELETE FROM news WHERE id = :id AND type = 'promotion'")
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
+        DB_Model::query("delete from news where id = :id and type = 'promotion'")
             ?->bind_values(['id' => $id])?->execute();
         return Response::redirect('/promotions');
     }

@@ -89,6 +89,9 @@ final class Categories {
             return Response::view(Common_View::layout($content, title: Locale::get('category.edit_title'), page_name: 'products', user: $user));
         }
 
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
         DB_Model::query("delete from category_translations where category_id = :id")
             ?->bind_values(['id' => $id])?->execute();
         DB_Model::query("insert into category_translations (category_id, lang_code, name) values (:id, 'ru', :name)")
@@ -104,6 +107,9 @@ final class Categories {
         if (!$user) return Response::redirect('/');
         $id = (int)$req->binds['id'];
 
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
         DB_Model::query("delete from categories where id = :id")
             ?->bind_values(['id' => $id])?->execute();
 

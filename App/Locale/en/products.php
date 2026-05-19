@@ -12,6 +12,7 @@ return [
     'search_msg' => 'Searching on "{{query}}"',
 
     'add_product_title' => 'Add product',
+    'edit_product_title' => 'Edit product',
     'field_name_ru' => 'Name (RU)',
     'field_name_en' => 'Name (EN)',
     'field_description_ru' => 'Description (RU)',
@@ -21,5 +22,8 @@ return [
     'field_images' => 'Images',
     'select_category' => 'Select category',
     'submit' => 'Save',
+
     'add_product' => 'Add product',
+    'edit_product' => 'Edit',
+    'delete_product' => 'Delete',
 ];

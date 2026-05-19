@@ -5,6 +5,7 @@ use App\Core\View\View;
 use App\Core\Locale;
 use App\Core\View\Component_Func;
 use App\Models\User;
+use App\Models\User_Privileges;
 
 final class Products {
     public static function category_panel(array $categories, bool $is_admin, ?int $active_id = null): Component {
@@ -78,7 +79,7 @@ final class Products {
 
             $html = '';
             if ($is_admin) {
-                $html .= '<a href="/products/add_product" class="admin-add-btn" style="margin-bottom:20px;">' . htmlspecialchars(Locale::get('products.add_product')) . '</a>';
+                $html .= '<a href="/products/add" class="admin-add-btn" style="margin-bottom:20px;">' . htmlspecialchars(Locale::get('products.add_product')) . '</a>';
             }
             if (!is_null($search) && $search !== '') {
                 $html .= '<p>' . Locale::get('products.search_msg', ['query' => $search]) . '</p>';
@@ -123,9 +124,22 @@ final class Products {
                 ? '<button class="product-card-added" disabled>' . $__('added') . '</button>'
                 : "<button class=\"product-card-add\" hx-post=\"/cart/add\" hx-vals='{\"product_id\":{$id}}' hx-swap=\"outerHTML\">{$__('add_to_cart')}</button>";
 
+            $admin_controls = (is_null($user) || $user->privilege !== User_Privileges::ADMIN) ? '' : <<<HTML
+                    <br/>
+                    <form action="/products/delete/{$product->id}" method="post"
+                        style="display:inline;"
+                        onsubmit="return confirm('{$__('delete_confirm')}')">
+                        <button type="submit" class="admin-delete-btn">
+                            {$__('delete_product')}
+                        </button>
+                    </form>
+                    <hr/>
+                HTML;
+
             $html = <<<HTML
                 <div class="product-detail">
                     <a href="/products" class="back-link">{$__('back_to_catalog')}</a>
+                    {$admin_controls}
                     <div class="product-detail-main">
                         <div class="product-detail-gallery">
                             <img id="main-image" src="{$img_first}" alt="{$name}" class="main-image">
@@ -253,7 +267,7 @@ final class Products {
                 <div class="form">
                     <h2 class="form-title">{$__('add_product_title')}</h2>
                     {$error_html}
-                    <form method="post" action="/products/add_product" enctype="multipart/form-data">
+                    <form method="post" action="/products/add" enctype="multipart/form-data">
                         <label>{$__('field_name_ru')}</label>
                         <input type="text" name="name_ru" required>
                         <label>{$__('field_name_en')}</label>

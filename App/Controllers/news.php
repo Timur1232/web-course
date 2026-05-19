@@ -237,6 +237,9 @@ final class News {
             return Response::redirect('/');
         }
 
+        if (\Config::IS_USING_SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')?->execute();
+        }
         $id = (int)$req->binds['id'];
         DB_Model::query("delete from news where id = :id and type = 'news'")
             ?->bind_values(['id' => $id])?->execute();
