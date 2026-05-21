@@ -15,7 +15,7 @@ create table if not exists user_privileges (
 );
 
 create table if not exists news (
-    id integer primary key autoincrement,
+    id integer auto_increment primary key,
     date date not null,
     type varchar(10) default 'news',
 
@@ -27,7 +27,7 @@ create table if not exists news_translations (
     lang_code varchar(10) not null,
     title varchar(100) not null,
     preview varchar(100) not null,
-    content text,
+    content mediumtext,
 
     primary key (news_id, lang_code),
     foreign key (news_id) references news(id)
@@ -36,7 +36,7 @@ create table if not exists news_translations (
 );
 
 create table if not exists categories (
-    id integer primary key,
+    id integer primary key auto_increment
 );
 
 create table if not exists category_translations (
@@ -51,7 +51,7 @@ create table if not exists category_translations (
 );
 
 create table if not exists products (
-    id integer primary key,
+    id integer primary key auto_increment,
     category_id integer default null,
     price decimal(10,2) not null,
 
@@ -73,7 +73,7 @@ create table if not exists product_translations (
 );
 
 create table if not exists product_images (
-    id integer primary key,
+    id integer primary key auto_increment,
     product_id integer not null,
     number integer not null,
     image_url varchar(255) not null,
@@ -84,7 +84,7 @@ create table if not exists product_images (
 );
 
 create table if not exists orders (
-    id integer primary key,
+    id integer primary key auto_increment,
     date timestamp default current_timestamp,
     customer_name varchar(150) not null,
     phone varchar(30) not null,
@@ -97,7 +97,7 @@ create table if not exists orders (
 );
 
 create table if not exists ordered_products (
-    id integer primary key,
+    id integer primary key auto_increment,
     order_id integer not null,
     product_id integer,
     count integer not null,
@@ -112,7 +112,7 @@ create table if not exists ordered_products (
 );
 
 create table if not exists reviews (
-    id integer primary key,
+    id integer primary key auto_increment,
     product_id integer not null,
     author_name varchar(100) not null,
     date timestamp default current_timestamp,
@@ -126,7 +126,7 @@ create table if not exists reviews (
 );
 
 create table if not exists callback_messages (
-    id integer primary key,
+    id integer primary key auto_increment,
     name varchar(100) not null,
     email varchar(100) not null,
     message text not null,

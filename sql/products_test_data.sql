@@ -1,7 +1,9 @@
+start transaction;
+
 -- Категории
-insert into categories default values; -- 1: guitars
-insert into categories default values; -- 2: keyboards
-insert into categories default values; -- 3: drums
+insert into categories (id) values (null); -- 1: guitars
+insert into categories (id) values (null); -- 2: keyboards
+insert into categories (id) values (null); -- 3: drums
 
 -- Переводы категорий
 insert into category_translations (category_id, lang_code, name) values
@@ -13,10 +15,10 @@ insert into category_translations (category_id, lang_code, name) values
 (3, 'en', 'Drums');
 
 -- Товары
-insert into products (category_id, price, visible) values (1, 599.99, 1);
-insert into products (category_id, price, visible) values (1, 899.99, 1);
-insert into products (category_id, price, visible) values (2, 1299.99, 1);
-insert into products (category_id, price, visible) values (3, 799.99, 1);
+insert into products (category_id, price) values (1, 599.99);
+insert into products (category_id, price) values (1, 899.99);
+insert into products (category_id, price) values (2, 1299.99);
+insert into products (category_id, price) values (3, 799.99);
 
 -- Переводы товаров (идентификаторы товаров: 1,2,3,4)
 insert into product_translations (product_id, lang_code, name, description) values
@@ -51,3 +53,5 @@ insert into product_images (product_id, number, image_url) values
 insert into product_images (product_id, number, image_url) values
 (4, 2, '/public/product_images/roland_module.jpg'),
 (4, 3, '/public/product_images/roland_pads.jpg');
+
+commit;

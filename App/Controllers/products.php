@@ -20,7 +20,7 @@ final class Products {
         $category_id = isset($req->url->query['category']) ? (int)$req->url->query['category'] : null;
         $page = max(1, (int)($req->url->query['page'] ?? 1));
         $per_page = 8;
-        $user = $req->additional['user'];
+        $user = $req->additional['user'] ?? null;
         $is_admin = (isset($user) && $user->privilege === User_Privileges::ADMIN);
 
         $search = $req->form['search'] ?? null;
@@ -33,15 +33,19 @@ final class Products {
         ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?? [];
         $categories = array_map(fn($r) => (object)$r, $cat_rows);
 
-        $where_category = is_null($category_id) ? '' : ' and p.category_id = :cat_id ';
-        $where_search = is_null($search) ? '' : ' and pt.name like :search ';
+        $where_category = is_null($category_id) ? '' : 'p.category_id = :cat_id';
+        $where_search = is_null($search) ? '' : 'pt.name like :search';
+
+        if (!is_null($category_id) && !is_null($search)) $where_search = 'and ' . $where_search;
+
+        $where = (is_null($category_id) && is_null($search)) ? '' : 'where';
 
         $sql = "
             select p.id, pt.name, p.price,
                    (select image_url from product_images where product_id = p.id order by number asc limit 1) as image_url
             from products p
             join product_translations pt on p.id = pt.product_id and pt.lang_code = :lang
-            where p.visible = 1 {$where_category} {$where_search}
+            {$where} {$where_category} {$where_search}
             order by p.id
         ";
         $stmt = DB_Model::query($sql);
@@ -97,7 +101,7 @@ final class Products {
             select p.id, pt.name, pt.description, p.price
             from products p
             join product_translations pt on p.id = pt.product_id and pt.lang_code = :lang
-            where p.id = :id and p.visible = 1
+            where p.id = :id
             ")?->bind_values(['lang' => $lang, 'id' => $id])?->execute();
 
         if (!$stmt || !($row = $stmt->fetch())) {
@@ -235,7 +239,7 @@ final class Products {
             ));
         }
 
-        DB_Model::query("insert into products (category_id, price, visible) values (:cat, :price, 1)")
+        DB_Model::query("insert into products (category_id, price) values (:cat, :price)")
         ?->bind_values(['cat' => $category_id, 'price' => $price])?->execute();
         $product_id = DB_Model::$conn->lastInsertId();
 

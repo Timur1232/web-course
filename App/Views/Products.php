@@ -72,15 +72,16 @@ final class Products {
 
     public static function product_grid(array $products, bool $is_admin, ?string $search, array $cart_ids = []): Component {
         return View::func(function () use ($products, $is_admin, $search, $cart_ids) {
-            if (empty($products)) {
-                return '<p class="no-products">' . htmlspecialchars(Locale::get('products.no_products')) . '</p>';
-            }
-            $cards = array_map(fn($p) => self::product_card($p, $cart_ids)->render(), $products);
-
             $html = '';
             if ($is_admin) {
                 $html .= '<a href="/products/add" class="admin-add-btn" style="margin-bottom:20px;">' . htmlspecialchars(Locale::get('products.add_product')) . '</a>';
             }
+            if (empty($products)) {
+                $html .= '<p class="no-products">' . htmlspecialchars(Locale::get('products.no_products')) . '</p>';
+                return $html;
+            }
+            $cards = array_map(fn($p) => self::product_card($p, $cart_ids)->render(), $products);
+
             if (!is_null($search) && $search !== '') {
                 $html .= '<p>' . Locale::get('products.search_msg', ['query' => $search]) . '</p>';
             }

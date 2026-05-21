@@ -24,7 +24,7 @@ final class Cart {
                 select p.id, pt.name, p.price
                 from products p
                 join product_translations pt on p.id = pt.product_id and pt.lang_code = ?
-                where p.id in ($placeholders) and p.visible = 1
+                where p.id in ($placeholders)
                 ")?->bind_values(array_merge([$lang], $ids))?->execute()?->fetch_all() ?: [];
 
             foreach ($rows as $row) {
@@ -191,7 +191,7 @@ final class Cart {
                 select p.id, pt.name, p.price
                 from products p
                 join product_translations pt on p.id = pt.product_id and pt.lang_code = ?
-                where p.id in ($placeholders) and p.visible = 1
+                where p.id in ($placeholders)
                 ")?->bind_values(array_merge([$lang], $ids))?->execute()?->fetch_all() ?: [];
 
             foreach ($rows as $row) {

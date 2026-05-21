@@ -29,8 +29,9 @@ use \App\Controllers\Static_Pages;
 use \App\Controllers\Promotions;
 use \App\Controllers\Categories;
 
+$conn_str = 'host=' . Config::MYSQL_HOST . ';port=3306;dbname=' . Config::MYSQL_DB;
 DB_Model::my_sql_connect(
-        'host=' . Config::MYSQL_HOST . ';dbname=' . Config::MYSQL_DB . ';charset=utf8mb4',
+        $conn_str,
         Config::MYSQL_USER,
         Config::MYSQL_PASSWORD,
         [

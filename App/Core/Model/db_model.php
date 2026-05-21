@@ -82,7 +82,7 @@ final class DB_Model {
     public static PDO $conn;
 
     public static function my_sql_connect(string $conn_string, ?string $username = null, ?string $password = null, ?array $options = null): void {
-        self::$conn = new Mysql($conn_string, $username, $password, $options);
+        self::$conn = new Mysql("mysql:$conn_string", $username, $password, $options);
     }
 
     public static function sqlite_connect(string $db_path): void {

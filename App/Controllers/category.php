@@ -2,8 +2,6 @@
 
 use App\Core\Context\Request;
 use App\Core\Context\Response;
-use App\Core\Helpers\Helpers;
-use App\Core\Helpers\Log;
 use App\Core\Locale;
 use App\Core\Model\DB_Model;
 use App\Core\View\Component_Func;
@@ -43,7 +41,7 @@ final class Categories {
             return Response::view(Common_View::layout($content, title: Locale::get('category.add_title'), page_name: 'products', user: $user));
         }
 
-        DB_Model::query("insert into categories default values")?->execute();
+        DB_Model::query("insert into categories (id) values (null)")?->execute();
         $id = DB_Model::$conn->lastInsertId();
 
         DB_Model::query("insert into category_translations (category_id, lang_code, name) values (:id, 'ru', :name)")
