@@ -17,7 +17,7 @@ return [
     'field_name_en' => 'Название (EN)',
     'field_description_ru' => 'Описание (RU)',
     'field_description_en' => 'Описание (EN)',
-    'field_price' => 'Цена',
+    'field_price' => 'Цена ₸',
     'field_category' => 'Категория',
     'field_images' => 'Изображения',
     'select_category' => 'Выберите категорию',

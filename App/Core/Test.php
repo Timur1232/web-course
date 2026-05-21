@@ -174,7 +174,7 @@ final class Test {
     }
 }
 
-final class TestDriver {
+final class Test_Driver {
 
     /**
      * @var string[] $test_classes
@@ -189,7 +189,6 @@ final class TestDriver {
      * @param string[] $test_classes
      */
     public static function setup(array $test_classes = []): void {
-        require_once './App/Core/Init.php';
         if (!defined('TEST_STDIN'))  define('TEST_STDIN',  fopen('php://stdin', 'rb'));
         if (!defined('TEST_STDOUT')) define('TEST_STDOUT', fopen('php://stdout', 'wb'));
         if (!defined('TEST_STDERR')) define('TEST_STDERR', fopen('php://stderr', 'wb'));

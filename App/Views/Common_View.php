@@ -74,10 +74,11 @@ final class Common_View {
                                     <?= count($_SESSION['cart'] ?? []) ?: '' ?>
                                 </span>
                                 <div class="lang-select">
-                                    <select onchange="document.cookie='lang='+this.value+';path=/';location.reload();">
+                                    <select id="lang_select" onchange="document.cookie='lang='+this.value+';path=/';location.reload();">
                                         <option value="ru" <?= ($_COOKIE['lang'] ?? 'ru') === 'ru' ? 'selected' : '' ?>>RU</option>
                                         <option value="en" <?= ($_COOKIE['lang'] ?? 'ru') === 'en' ? 'selected' : '' ?>>EN</option>
                                     </select>
+                                    <label style="font-size:12px;" for="lang_select">🌐</label>
                                 </div>
                                 <div class="user-actions" id="user-actions">
                                     <?php if (is_null($user)): ?>

@@ -5,6 +5,11 @@ use PDOStatement;
 use Pdo\Mysql;
 use Pdo\Sqlite;
 
+enum DB_Type {
+    case SQLITE;
+    case MYSQL;
+}
+
 final class DB_Stmt {
     public function __construct(
         public ?PDOStatement $stmt = null,

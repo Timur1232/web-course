@@ -1,7 +1,6 @@
 <?php namespace App\Core\Helpers;
 use App\Core\Context\Router;
 use App\Core\View\View;
-use Exception;
 
 final class Helpers {
     private function __construct() {}

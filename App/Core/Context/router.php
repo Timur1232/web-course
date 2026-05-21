@@ -7,8 +7,6 @@ use App\Core\View\View;
 use Closure;
 use Throwable;
 
-// TODO: Refactor Router and Route_Group classes to remove duplicated code
-
 final class Router {
 
     private static bool $handled = false;

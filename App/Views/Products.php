@@ -63,7 +63,7 @@ final class Products {
                 </div>
                 <div class="product-card-name">{$name}</div>
                 </a>
-                <div class="product-card-price">{$price} €</div>
+                <div class="product-card-price">{$price} ₸</div>
                 {$button}
                 </div>
                 HTML;
@@ -147,7 +147,7 @@ final class Products {
                         </div>
                         <div class="product-detail-info">
                             <h2>{$name}</h2>
-                            <p class="product-detail-price">{$price} €</p>
+                            <p class="product-detail-price">{$price} ₸</p>
                             <div class="product-detail-desc">
                                 <h3>{$__('description')}</h3>
                                 {$desc}

@@ -16,7 +16,7 @@ final class News {
         $lang = Locale::get_language();
         $user = $req->additional['user'] ?? null;
         $page = max(1, (int)($req->url->query['page'] ?? 1));
-        $per_page = 10;
+        $per_page = 5;
 
         $count_sql = "
             select count(*) as cnt

@@ -2,7 +2,6 @@
 
 use App\Core\Context\Request;
 use App\Core\Context\Response;
-use App\Core\Helpers\Helpers;
 use App\Core\Helpers\Log;
 use App\Core\Model\DB_Model;
 use App\Core\Locale;
@@ -31,7 +30,7 @@ final class Products {
             from categories c
             join category_translations ct on c.id = ct.category_id and ct.lang_code = :lang
             order by ct.name
-        ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?: [];
+        ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?? [];
         $categories = array_map(fn($r) => (object)$r, $cat_rows);
 
         $where_category = is_null($category_id) ? '' : ' and p.category_id = :cat_id ';

@@ -29,7 +29,15 @@ use \App\Controllers\Static_Pages;
 use \App\Controllers\Promotions;
 use \App\Controllers\Categories;
 
-DB_Model::sqlite_connect('test.db');
+DB_Model::my_sql_connect(
+        'host=' . Config::MYSQL_HOST . ';dbname=' . Config::MYSQL_DB . ';charset=utf8mb4',
+        Config::MYSQL_USER,
+        Config::MYSQL_PASSWORD,
+        [
+            Pdo\Mysql::ATTR_DEFAULT_FETCH_MODE => Pdo\Mysql::FETCH_ASSOC,
+            Pdo\Mysql::ATTR_EMULATE_PREPARES   => false,
+        ],
+);
 Router::setup_current_request();
 Router::$global_middleware = [
     Get_User::class,

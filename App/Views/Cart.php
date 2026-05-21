@@ -12,7 +12,7 @@ final class Cart {
             $html .= '<h2>' . htmlspecialchars($__('title')) . '</h2>';
 
             $html .= \App\Views\Cart::render_items($items);
-            $html .= '<div class="cart-total" id="cart-total">' . htmlspecialchars($__('total')) . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
+            $html .= '<div class="cart-total" id="cart-total">' . htmlspecialchars($__('total')) . ': ' . number_format($total, 2, '.', ' ') . ' ₸</div>';
 
             if (!empty($items)) {
                 $html .= '<hr>';
@@ -46,7 +46,7 @@ final class Cart {
                     <span class="qty-val">{$qty}</span>
                     <button class="qty-btn" hx-post="/cart/update" hx-vals='{"product_id":{$id},"delta":1}' hx-target="#cart-items" hx-swap="outerHTML">{$__('increase')}</button>
                 </span>
-                <span class="cart-item-subtotal">{$subtotal} €</span>
+                <span class="cart-item-subtotal">{$subtotal} ₸</span>
                 <button class="remove-btn" hx-post="/cart/remove" hx-vals='{"product_id":{$id}}' hx-target="#cart-items" hx-swap="outerHTML">{$__('remove')}</button>
             </div>
             HTML;
