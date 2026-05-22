@@ -1,5 +1,8 @@
 <?php namespace App\Core\Model;
+
+use App\Core\Helpers\Log;
 use App\Core\Helpers\Result;
+use Exception;
 use PDO;
 use PDOStatement;
 use Pdo\Mysql;
@@ -20,7 +23,14 @@ final class DB_Stmt {
     */
     public function execute(): Result {
         if (is_null($this->stmt)) return Result::ERROR('pdo statement is null');
-        $res = $this->stmt->execute();
+        $res = false;
+        try {
+            $res = $this->stmt->execute();
+        } catch (Exception $e) {
+            $err = $this->stmt->errorInfo();
+            Log::error(__METHOD__.": {$e->getMessage()}\n{$err}\n{$e->getTraceAsString()}");
+            return Result::ERROR('error during executing, info: '.print_r($err, true));
+        }
         if ($res === false) return Result::ERROR('error during executing, info: '.print_r($this->stmt->errorInfo(), true));
         return Result::OK($this);
     }
@@ -37,8 +47,15 @@ final class DB_Stmt {
         if (is_null($this->stmt)) return Result::ERROR('pdo statement is null');
         $execute_res = $this->execute();
         if (!$execute_res->ok) return $execute_res;
-        $ret = $this->stmt->fetch(PDO::FETCH_ASSOC);
-        if ($ret === false) return Result::ERROR('error during executing, info: '.print_r($this->stmt->errorInfo(), true));
+        $ret = false;
+        try {
+            $ret = $this->stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            $err = $this->stmt->errorInfo();
+            Log::error(__METHOD__.": {$e->getMessage()}\n{$err}\n{$e->getTraceAsString()}");
+            return Result::ERROR('error during fetching, info: '.print_r($err, true));
+        }
+        if ($ret === false) return Result::ERROR('error during fetching, info: '.print_r($this->stmt->errorInfo(), true));
         return Result::OK($ret);
     }
 
@@ -49,7 +66,15 @@ final class DB_Stmt {
         if (is_null($this->stmt)) return Result::ERROR('pdo statement is null');
         $execute_res = $this->execute();
         if (!$execute_res->ok) return $execute_res;
-        return Result::OK($this->stmt->fetchAll(PDO::FETCH_ASSOC));
+        $ret = null;
+        try {
+            $ret = $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            $err = $this->stmt->errorInfo();
+            Log::error(__METHOD__.": {$e->getMessage()}\n{$err}\n{$e->getTraceAsString()}");
+            return Result::ERROR('error during fetching, info: '.print_r($err, true));
+        }
+        return Result::OK($ret);
     }
 
     /**
@@ -71,20 +96,26 @@ final class DB_Stmt {
         }
 
         $i = 0;
-        foreach ($vals as $index => $val) {
-            if (is_int($index)) {
-                if (!$this->stmt->bindValue($i+1, $val)) {
-                    return Result::ERROR('unable to bind value with index = '.print_r($index, true));
+        try {
+            foreach ($vals as $index => $val) {
+                if (is_int($index)) {
+                    if (!$this->stmt->bindValue($i+1, $val)) {
+                        return Result::ERROR('unable to bind value with index = '.print_r($index, true));
+                    }
+                } else if (is_string($index)) {
+                    if ($numbered) $index .= strval($i);
+                    if (!$this->stmt->bindValue($index, $val)) {
+                        return Result::ERROR('Unable to bind value with index = '.print_r($index, true));
+                    }
+                } else {
+                    return Result::ERROR('Incorrect index type: '.print_r($index, true));
                 }
-            } else if (is_string($index)) {
-                if ($numbered) $index .= strval($i);
-                if (!$this->stmt->bindValue($index, $val)) {
-                    return Result::ERROR('Unable to bind value with index = '.print_r($index, true));
-                }
-            } else {
-                return Result::ERROR('Incorrect index type: '.print_r($index, true));
+                $i += 1;
             }
-            $i += 1;
+        } catch (Exception $e) {
+            $err = $this->stmt->errorInfo();
+            Log::error(__METHOD__.": {$e->getMessage()}\n{$err}\n{$e->getTraceAsString()}");
+            return Result::ERROR('error during binding, info: '.print_r($err, true));
         }
         return Result::OK($this);
     }
@@ -121,7 +152,13 @@ final class DB_Model {
     * @return Result<DB_Stmt>
     */
     public static function query(string $sql): Result {
-        $stmt = self::$conn->prepare($sql);
+        $stmt = false;
+        try {
+            $stmt = self::$conn->prepare($sql);
+        } catch (Exception $e) {
+            Log::error(__METHOD__.": $sql; {$e->getMessage()}\n{$e->getTraceAsString()}");
+            return Result::ERROR('unable to prepare query: '.$sql);
+        }
         if ($stmt === false) return Result::ERROR('unable to prepare query: '.$sql);
         return Result::OK(new DB_Stmt($stmt));
     }

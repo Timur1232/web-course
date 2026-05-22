@@ -8,15 +8,9 @@ use App\Core\Model\DB_Type;
 use App\Core\View\Component_Func;
 use App\Core\View\View;
 use App\Views\Common_View;
-use App\Models\Dto\User_Privileges;
 
 final class Categories {
     private function __construct() {}
-
-    private static function require_admin(Request $req): ?object {
-        $user = $req->additional['user'] ?? null;
-        return ($user !== null && $user->privilege === User_Privileges::ADMIN) ? $user : null;
-    }
 
     public static function add_form(Request $req): Response {
         $user = $req->additional['user'];

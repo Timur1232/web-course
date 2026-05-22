@@ -1,8 +1,23 @@
 <?php
 return [
-    'page_title' => 'Admin',
-    'title' => 'Manage users',
-    'pr_customer' => 'Customer',
-    'pr_admin' => 'Admin',
+    'page_title'     => 'Admin',
+    'title'          => 'Manage users',
+    'pr_customer'    => 'Customer',
+    'pr_admin'       => 'Admin',
     'delete_confirm' => 'Delete this user?',
+
+    'add_btn'             => 'New user',
+    'user_form_title'     => 'Add new user',
+    'user_form_login'     => 'Login',
+    'user_form_email'     => 'Email',
+    'user_form_password'  => 'Password',
+    'user_form_privilege' => 'Role',
+    'submit_btn'          => 'Submit',
+    'reset_btn'           => 'Cancel',
+    'customer'            => 'Customer',
+    'admin'               => 'Admin',
+
+    'invalid_data_err' => 'Invalid data',
+    'insert_err'       => 'Insertion error',
+    'exists_err'       => 'User already exists',
 ];

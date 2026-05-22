@@ -5,4 +5,19 @@ return [
     'pr_customer' => 'Покупатель',
     'pr_admin' => 'Админ',
     'delete_confirm' => 'Удалить пользователя?',
+
+    'add_btn'             => 'Новый пользователь',
+    'user_form_title'     => 'Добавить нового пользователя',
+    'user_form_login'     => 'Логин',
+    'user_form_email'     => 'Почта',
+    'user_form_password'  => 'Пароль',
+    'user_form_privilege' => 'Роль',
+    'submit_btn'          => 'Отправить',
+    'reset_btn'           => 'Отмена',
+    'customer'            => 'Покупатель',
+    'admin'               => 'Админ',
+
+    'invalid_data_err' => 'Неправильные данные',
+    'insert_err'       => 'Ошибка вставки',
+    'exists_err'       => 'Пользователь уже существует',
 ];

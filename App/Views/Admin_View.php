@@ -14,8 +14,10 @@ final class Admin_View {
                 $list_items .= self::user_list_item($user);
             }
             $title = Locale::get('admin.title');
+            $add_button = Locale::get('admin.add_btn');
             return <<<HTML
                 <h2>{$title}</h2>
+                <a href="/admin/users/create" class="admin-add-btn">{$add_button}</a>
                 <div class="user-list">
                     {$list_items}
                 </div>
@@ -43,5 +45,31 @@ final class Admin_View {
                 </form>
             </div>
             HTML;
+    }
+
+    public static function user_form(?string $error = null): Component_Func {
+        return View::func(function () use ($error): string {
+            $__ = fn($key, $replace = []) => Locale::get("admin.{$key}", $replace);
+            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            return <<<HTML
+                <form class="form" method="post" action="/admin/users/create">
+                    <h2 class="form-title">{$__('user_form_title')}</h2>
+                    {$error_html}
+                    <label>{$__('user_form_login')}</label>
+                    <input type="text" name="login" required>
+                    <label>{$__('user_form_email')}</label>
+                    <input type="email" name="email" required>
+                    <label>{$__('user_form_password')}</label>
+                    <input type="password" name="password" required>
+                    <label>{$__('user_form_privilege')}</label>
+                    <select name="privilege">
+                        <option value="customer" selected>{$__('customer')}</option>
+                        <option value="admin">{$__('admin')}</option>
+                    </select>
+                    <button class="form-submit" type="submit">{$__('submit_btn')}</button>
+                    <a href="/admin" class="form-cancel" type="reset">{$__('reset_btn')}</a>
+                </form>
+            HTML;
+        });
     }
 }

@@ -132,3 +132,5 @@ $admin = Router::group('/admin', middleware: [
 $admin->GET('/', Admin::index(...));
 $admin->POST('/users/update', Admin::update(...));
 $admin->POST('/users/delete', Admin::delete(...));
+$admin->GET('/users/create', Admin::user_form(...));
+$admin->POST('/users/create', Admin::user_create(...));
