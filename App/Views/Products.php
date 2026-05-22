@@ -4,8 +4,9 @@ use App\Core\View\Component;
 use App\Core\View\View;
 use App\Core\Locale;
 use App\Core\View\Component_Func;
-use App\Models\User;
-use App\Models\User_Privileges;
+use App\Models\Dto\Product_Showcase;
+use App\Models\Dto\User;
+use App\Models\Dto\User_Privileges;
 
 final class Products {
     public static function category_panel(array $categories, bool $is_admin, ?int $active_id = null): Component {
@@ -42,7 +43,7 @@ final class Products {
         });
     }
 
-    public static function product_card(object $product, array $cart_ids = []): Component {
+    public static function product_card(Product_Showcase $product, array $cart_ids = []): Component {
         return View::func(function () use ($product, $cart_ids) {
             $__ = fn($key) => Locale::get("products.{$key}");
             $img = htmlspecialchars($product->image_url ?? '/public/media/placeholder.png');

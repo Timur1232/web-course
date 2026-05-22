@@ -1,8 +1,8 @@
 <?php namespace App\Views;
 use App\Core\View\Component;
 use App\Core\View\View;
-use App\Models\User;
-use App\Models\User_Privileges;
+use App\Models\Dto\User;
+use App\Models\Dto\User_Privileges;
 
 final class Common_View {
     /**

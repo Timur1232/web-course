@@ -3,8 +3,8 @@
 use App\Core\View\Component;
 use App\Core\View\View;
 use App\Core\Locale;
-use App\Models\User;
-use App\Models\User_Privileges;
+use App\Models\Dto\User;
+use App\Models\Dto\User_Privileges;
 
 final class News_View {
     public static function news_list(array $news_items, ?User $user, int $page, int $total_pages, string $base_url): Component {

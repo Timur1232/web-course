@@ -88,7 +88,7 @@ bool on_file_watch(Walk_Entry entry)
 Cmd cmd = {0};
 Procs procs = {0};
 
-bool start_php_server()
+bool start_debug_php_server()
 {
     cmd_append(&cmd, "php");
     cmd_append(&cmd, "-S", "localhost:" PORT);
@@ -196,7 +196,7 @@ int main(int argc, char** argv)
             }));
         }
 
-        if (!start_php_server()) {
+        if (!start_debug_php_server()) {
             return_defer(1);
         }
         if (!open_localhost()) return_defer(1);
@@ -235,7 +235,7 @@ int main(int argc, char** argv)
             }
             if (modified) {
                 if (!stop_php_server())  return_defer(1);
-                if (!start_php_server()) return_defer(1);
+                if (!start_debug_php_server()) return_defer(1);
             }
             sleep(1);
         }

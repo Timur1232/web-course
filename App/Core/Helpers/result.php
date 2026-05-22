@@ -11,17 +11,32 @@ final class Result {
      * @param array<int,mixed> $arguments
      */
     public function __call(string $name, array $arguments = []): self {
-        if (!$this->ok) {
-            return $this;
+        if ($this->ok) {
+            $new_val = $this->val->$name(...$arguments);
+            if ($new_val instanceof self) {
+                if (!$new_val->ok) return $new_val;
+                $new_val = $new_val->val;
+            }
+            $this->val = $new_val;
         }
-        return self::OK($this->val->$name(...$arguments));
+        return $this;
     }
 
     public function __get(string $name): mixed {
-        if (!$this->ok) {
-            return $this;
+        if ($this->ok) {
+            $new_val = $this->val->$name;
+            if ($new_val instanceof self) {
+                if (!$new_val->ok) return $new_val;
+                $new_val = $new_val->val;
+            }
+            $this->val = $new_val;
         }
-        return self::OK($this->val->$name);
+        return $this;
+    }
+
+    public function or_else(mixed $value): mixed {
+        if ($this->ok) return $this->val;
+        return $value;
     }
 
     public static function OK(mixed $val = null): self {

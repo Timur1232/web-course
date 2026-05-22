@@ -8,7 +8,7 @@ use App\Core\View\Js_Script;
 use App\Core\View\View;
 use App\Views\Common_View;
 use App\Views\Static_Page;
-use App\Models\User_Privileges;
+use App\Models\Dto\User_Privileges;
 
 final class Static_Pages {
     private function __construct() {}
@@ -38,11 +38,7 @@ final class Static_Pages {
     }
 
     public static function about_edit(Request $req): Response {
-        $user = $req->additional['user'] ?? null;
-        if (is_null($user) || $user->privilege !== User_Privileges::ADMIN) {
-            return Response::redirect('/');
-        }
-
+        $user = $req->additional['user'];
         $__ = fn(string $key) => Locale::get('about.'.$key);
         $file_path = $__('file_path');
         if (!file_exists($file_path)) {
@@ -60,11 +56,6 @@ final class Static_Pages {
     }
 
     public static function about_save(Request $req): Response {
-        $user = $req->additional['user'] ?? null;
-        if (!$user || $user->privilege !== User_Privileges::ADMIN) {
-            return Response::redirect('/');
-        }
-
         $content = $req->form['content'] ?? '';
         $content = strip_tags($content, '<p><a><b><i><strong><em><ul><ol><li><br><img><h1><h2><h3><h4><span><div><table><tr><td><th><thead><tbody><tfoot><iframe>');
 
@@ -103,11 +94,7 @@ final class Static_Pages {
     }
 
     public static function site_scheme_edit(Request $req): Response {
-        $user = $req->additional['user'] ?? null;
-        if (is_null($user) || $user->privilege !== User_Privileges::ADMIN) {
-            return Response::redirect('/');
-        }
-
+        $user = $req->additional['user'];
         $__ = fn(string $key) => Locale::get('site_scheme.'.$key);
         $file_path = $__('file_path');
         if (!file_exists($file_path)) {
@@ -125,11 +112,6 @@ final class Static_Pages {
     }
 
     public static function site_scheme_save(Request $req): Response {
-        $user = $req->additional['user'] ?? null;
-        if (!$user || $user->privilege !== User_Privileges::ADMIN) {
-            return Response::redirect('/');
-        }
-
         $content = $req->form['content'] ?? '';
         $content = strip_tags($content, '<p><a><b><i><strong><em><ul><ol><li><br><img><h1><h2><h3><h4><span><div><table><tr><td><th><thead><tbody><tfoot><iframe>');
 

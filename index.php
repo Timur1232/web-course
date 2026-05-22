@@ -21,24 +21,28 @@ use App\Middleware\Set_Language;
 use \App\Controllers\User_Actions;
 use \App\Controllers\Cart;
 use \App\Controllers\Feedback;
-use App\Core\Context\Request;
-use App\Core\Context\Response;
-use App\Core\View\View;
 use \App\Controllers\News;
 use \App\Controllers\Static_Pages;
 use \App\Controllers\Promotions;
 use \App\Controllers\Categories;
+use App\Middleware\Require_Admin;
+use App\Middleware\User_Auth;
 
-$conn_str = 'host=' . Config::MYSQL_HOST . ';port=3306;dbname=' . Config::MYSQL_DB;
-DB_Model::my_sql_connect(
-        $conn_str,
-        Config::MYSQL_USER,
-        Config::MYSQL_PASSWORD,
-        [
+if (php_sapi_name() === 'cli-server') {
+    DB_Model::sqlite_connect('test.db');
+} else {
+    DB_Model::my_sql_connect(
+        host: Config::MYSQL_HOST,
+        port: Config::MYSQL_PORT,
+        db_name: Config::MYSQL_DB,
+        username: Config::MYSQL_USER,
+        password: Config::MYSQL_PASSWORD,
+        options: [
             Pdo\Mysql::ATTR_DEFAULT_FETCH_MODE => Pdo\Mysql::FETCH_ASSOC,
             Pdo\Mysql::ATTR_EMULATE_PREPARES   => false,
         ],
-);
+    );
+}
 Router::setup_current_request();
 Router::$global_middleware = [
     Get_User::class,
@@ -50,14 +54,18 @@ Router::GET('/products', Products::index(...));
 Router::POST('/products/delete/:id', Products::delete(...));
 Router::GET('/products/search', Products::index(...));
 
-Router::GET('/products/add', Products::add_form(...));
-Router::POST('/products/add', Products::create(...));
+$products_admin = Router::group('/products', middleware: [
+    Require_Admin::class,
+]);
 
-Router::GET('/products/add_category', Categories::add_form(...));
-Router::POST('/products/add_category', Categories::create(...));
-Router::GET('/products/edit_category/:id', Categories::edit_form(...));
-Router::POST('/products/edit_category/:id', Categories::update(...));
-Router::GET('/products/delete_category/:id', Categories::delete(...));
+$products_admin->GET('/add', Products::add_form(...));
+$products_admin->POST('/add', Products::create(...));
+
+$products_admin->GET('/add_category', Categories::add_form(...));
+$products_admin->POST('/add_category', Categories::create(...));
+$products_admin->GET('/edit_category/:id', Categories::edit_form(...));
+$products_admin->POST('/edit_category/:id', Categories::update(...));
+$products_admin->GET('/delete_category/:id', Categories::delete(...));
 
 Router::GET('/products/:id', Products::show(...));
 Router::POST('/products/:id/review', Products::add_review(...));
@@ -74,43 +82,53 @@ Router::POST('/logout', User_Actions::logout(...));
 Router::GET('/register', User_Actions::register_form(...));
 Router::POST('/register', User_Actions::register_post(...));
 
-Router::GET('/feedback', Feedback::index(...));
-Router::POST('/feedback', Feedback::send(...));
+$feedback = Router::group('/feedback', middleware: [
+    User_Auth::class,
+]);
+$feedback->GET('/', Feedback::index(...));
+$feedback->POST('/', Feedback::send(...));
 
 Router::GET('/map', \App\Controllers\Map::index(...));
 
 Router::GET('/about', Static_Pages::about(...));
-Router::GET('/about/edit', Static_Pages::about_edit(...));
-Router::POST('/about/save', Static_Pages::about_save(...));
+$about_admin = Router::group('/about', middleware: [
+    Require_Admin::class,
+]);
+$about_admin->GET('/edit', Static_Pages::about_edit(...));
+$about_admin->POST('/save', Static_Pages::about_save(...));
 
 Router::GET('/site_scheme', Static_Pages::site_scheme(...));
-Router::GET('/site_scheme/edit', Static_Pages::site_scheme_edit(...));
-Router::POST('/site_scheme/save', Static_Pages::site_scheme_save(...));
+$scheme_admin = Router::group('/site_scheme', middleware: [
+    Require_Admin::class,
+]);
+$scheme_admin->GET('/edit', Static_Pages::site_scheme_edit(...));
+$scheme_admin->POST('/save', Static_Pages::site_scheme_save(...));
 
+$news_admin = Router::group('/news', middleware: [
+    Require_Admin::class,
+]);
+$news_admin->GET('/new', News::new(...));
+$news_admin->POST('/new', News::create(...));
+$news_admin->GET('/:id/edit', News::edit(...));
+$news_admin->POST('/:id/edit', News::update(...));
+$news_admin->POST('/:id/delete', News::delete(...));
 Router::GET('/news', News::index(...));
-Router::GET('/news/new', News::new(...));
-Router::POST('/news/new', News::create(...));
 Router::GET('/news/:id', News::show(...));
-Router::GET('/news/:id/edit', News::edit(...));
-Router::POST('/news/:id/edit', News::update(...));
-Router::POST('/news/:id/delete', News::delete(...));
 
+$promotions_admin = Router::group('/promotions', middleware: [
+    Require_Admin::class,
+]);
+$promotions_admin->GET('/new', Promotions::new(...));
+$promotions_admin->POST('/new', Promotions::create(...));
+$promotions_admin->GET('/:id/edit', Promotions::edit(...));
+$promotions_admin->POST('/:id/edit', Promotions::update(...));
+$promotions_admin->POST('/:id/delete', Promotions::delete(...));
 Router::GET('/promotions', Promotions::index(...));
-Router::GET('/promotions/new', Promotions::new(...));
-Router::POST('/promotions/new', Promotions::create(...));
 Router::GET('/promotions/:id', Promotions::show(...));
-Router::GET('/promotions/:id/edit', Promotions::edit(...));
-Router::POST('/promotions/:id/edit', Promotions::update(...));
-Router::POST('/promotions/:id/delete', Promotions::delete(...));
 
-Router::GET('/admin', Admin::index(...));
-Router::POST('/admin/users/update', Admin::update(...));
-Router::POST('/admin/users/delete', Admin::delete(...));
-
-Router::GET('/test', function (Request $req) {
-    return Response::view(View::template('test'));
-});
-Router::POST('/test', function (Request $req) {
-    return Response::view(View::string($req->form['text']));
-});
-
+$admin = Router::group('/admin', middleware: [
+    Require_Admin::class
+]);
+$admin->GET('/', Admin::index(...));
+$admin->POST('/users/update', Admin::update(...));
+$admin->POST('/users/delete', Admin::delete(...));

@@ -8,9 +8,9 @@ use App\Core\Model\DB_Model;
 use App\Core\Model\AR_Reflect;
 use App\Core\Locale;
 use App\Jwt_Token;
-use App\Models\Common_Sql;
-use App\Models\User;
-use App\Models\User_Privileges;
+use App\Models\Common_Sql\Common_Sql;
+use App\Models\Dto\User;
+use App\Models\Dto\User_Privileges;
 
 final class User_Actions {
     private function __construct() {}
@@ -42,22 +42,20 @@ final class User_Actions {
         }
 
         $stmt = DB_Model::query(Common_Sql::select(User::class, where: 'login = :login'))
-            ?->bind_values(['login' => $login])
-            ?->execute();
-        if (!$stmt) {
+            ->bind_values(['login' => $login]);
+        if (!$stmt->ok) {
             return self::login_error($redirect_url, Locale::get('user_actions.error_invalid_credentials'));
         }
         $user_data = $stmt->fetch();
-        if (!$user_data || md5($password) !== ($user_data['password_hash'] ?? '')) {
+        if (!$user_data->ok || md5($password) !== ($user_data->val['password_hash'] ?? '')) {
             return self::login_error($redirect_url, Locale::get('user_actions.error_invalid_credentials'));
         }
 
         $priv_stmt = DB_Model::query("select privilege_name from user_privileges where user_login = :login")
-            ?->bind_values(['login' => $login])
-            ?->execute();
+            ->bind_values(['login' => $login]);
         $privilege = User_Privileges::CUSTOMER;
-        if ($priv_stmt) {
-            foreach ($priv_stmt->fetch_all() as $row) {
+        if ($priv_stmt->ok) {
+            foreach ($priv_stmt->fetch_all()->or_else([]) as $row) {
                 if ($row['privilege_name'] === User_Privileges::ADMIN->value) {
                     $privilege = User_Privileges::ADMIN;
                     break;
@@ -65,7 +63,7 @@ final class User_Actions {
             }
         }
 
-        $user_obj = AR_Reflect::construct(User::class, $user_data);
+        $user_obj = AR_Reflect::construct(User::class, $user_data->val);
         $user_obj->privilege = $privilege;
 
         $jwt = Jwt_Token::generate_jwt($user_obj);
@@ -121,27 +119,26 @@ final class User_Actions {
         }
 
         $exists = DB_Model::query(Common_Sql::select(User::class, where: 'login = :login'))
-            ?->bind_values(['login' => $login])
-            ?->execute();
-        if ($exists && $exists->fetch()) {
+            ->bind_values(['login' => $login]);
+        if ($exists->ok && $exists->fetch()->ok) {
             return self::register_error($redirect_url, Locale::get('user_actions.error_login_exists'));
         }
 
         $password_hash = md5($password);
         $insert_ok = DB_Model::query(Common_Sql::insert(User::class))
-            ?->bind_values([
+            ->bind_values([
                 'login'         => $login,
                 'email'         => $email,
                 'password_hash' => $password_hash,
             ])
-            ?->execute();
-        if (!$insert_ok) {
+            ->execute();
+        if (!$insert_ok->ok) {
             return self::register_error($redirect_url, 'Ошибка сервера');
         }
 
         DB_Model::query("insert into user_privileges (user_login, privilege_name) values (:login, :priv)")
-            ?->bind_values(['login' => $login, 'priv' => User_Privileges::CUSTOMER->value])
-            ?->execute();
+            ->bind_values(['login' => $login, 'priv' => User_Privileges::CUSTOMER->value])
+            ->execute();
 
         $new_user = new User(login: $login, email: $email, password_hash: $password_hash, privilege: User_Privileges::CUSTOMER);
         $jwt = Jwt_Token::generate_jwt($new_user);

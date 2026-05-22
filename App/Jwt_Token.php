@@ -2,9 +2,9 @@
 use \Config;
 use App\Core\Model\AR_Reflect;
 use App\Core\Model\DB_Model;
-use App\Models\Common_Sql;
-use App\Models\User;
-use App\Models\User_Privileges;
+use App\Models\Common_Sql\Common_Sql;
+use App\Models\Dto\User;
+use App\Models\Dto\User_Privileges;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use stdClass;
@@ -31,11 +31,10 @@ final class Jwt_Token {
         $decoded = JWT::decode($jwt, new Key(Config::JWT_SECRET_KEY, 'HS256'), $headers);
         $user_login = $decoded->user_login;
         $res = DB_Model::query(Common_Sql::select(User::class, where: "login = ?"))
-            ?->bind_values([$user_login])
-            ?->execute()
-            ?->fetch();
-        if (is_null($res)) return null;
-        $user = AR_Reflect::construct(User::class, $res);
+            ->bind_values([$user_login])
+            ->fetch();
+        if (!$res->ok) return null;
+        $user = AR_Reflect::construct(User::class, $res->val);
         $user->privilege = User_Privileges::from($decoded->user_privilege);
         return $user;
     }

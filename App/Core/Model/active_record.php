@@ -5,7 +5,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 final class Active_Record {
     public function __construct(
-        public string $table_name,
+        public ?string $table_name = null,
     ) {}
 }
 

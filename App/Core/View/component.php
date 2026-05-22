@@ -67,30 +67,9 @@ enum Json_Serialization {
 final class Json_Component implements Component {
     public function __construct(
         public mixed $object,
-        public Json_Serialization $type = Json_Serialization::DEFAULT,
     ) {}
+
     public function render(): string {
-        $json = '';
-        switch ($this->type) {
-            case Json_Serialization::DEFAULT: {
-                if ($this->object instanceof JsonSerializable) {
-                    return $this->object->jsonSerialize();
-                }
-                $json = Json::jsonify($this->object);
-            } break;
-            case Json_Serialization::MY_JSON: {
-                $json = Json::jsonify($this->object);
-            } break;
-            case Json_Serialization::JSON_SERIALIZEABLE: {
-                Error::assert($this->object instanceof JsonSerializable, 'JsonComponent: Serializable object does must implement JsonSerializable interface. Type given: \''.gettype($this->object).'\'');
-                $json = $this->object->jsonSerialize();
-            } break;
-        }
-        $json_str = json_encode($json);
-        if ($json_str === false) {
-            Log::error(__METHOD__.': Unable to serialize object of type '.gettype($this->object));
-            Error::internal_error();
-        }
-        return $json_str;
+        return json_encode($this->object);
     }
 }

@@ -1,12 +1,32 @@
-<?php namespace App\Models;
+<?php namespace App\Models\Common_Sql;
 use App\Core\Helpers\Error;
 use App\Core\Model\AR_Field;
 use App\Core\Model\AR_Reflect;
 use App\Core\Model\Active_Record;
 use App\Core\Test\Test;
 
+enum Order_Dir: string {
+    case ASC = 'asc';
+    case DESC = 'desc';
+}
+
+final class Order {
+    public function __construct(
+        public string $column,
+        public Order_Dir $direction,
+    ) {}
+
+    public static function asc(string $column): self {
+        return new self($column, Order_Dir::ASC);
+    }
+
+    public static function desc(string $column): self {
+        return new self($column, Order_Dir::DESC);
+    }
+}
+
 final class Common_Sql {
-    public static function select(string|array $source, ?string $table = null, string $where = ''): string {
+    public static function select(string|array $source, ?string $table = null, ?string $where = null, ?Order $order_by = null): string {
         if (is_array($source) && $table === null) {
             Error::assert(false, __METHOD__.': Table name is required when passing an array of columns.');
         }
@@ -16,14 +36,18 @@ final class Common_Sql {
         $column_list = implode(', ', $columns);
         $sql = "select {$column_list} from {$table}";
 
-        if ($where !== '') {
+        if (!is_null($where)) {
             $sql .= " where {$where}";
+        }
+
+        if (!is_null($order_by)) {
+            $sql .= ' order by ' . $order_by->column . ' ' . $order_by->direction->value;
         }
 
         return $sql;
     }
 
-    public static function insert(string|array $source, ?string $table = null): string {
+    public static function insert(string|array $source, ?string $table = null, int $count = 1): string {
         if (is_array($source) && $table === null) {
             Error::assert(false, __METHOD__.': Table name is required when passing an array of columns.');
         }
@@ -31,13 +55,23 @@ final class Common_Sql {
         $columns = [];
         self::resolve_table_and_columns($source, $table, $columns);
 
-        $columnList = implode(', ', $columns);
-        $bindingList = implode(', ', array_map(fn(string $col) => ":{$col}", $columns));
+        $column_list = implode(', ', $columns);
+        $binding_list = '';
+        if ($count === 1) {
+            $binding_list = '(' . implode(', ', array_map(fn(string $col) => ":{$col}", $columns)) . ')';
+        } else {
+            for ($i = 0; $i < $count; $i += 1) {
+                $binding_list .= '(' . implode(', ', array_map(fn(string $col) => ":{$col}{$i}", $columns)) . ')';
+                if ($i < $count-1) {
+                    $binding_list .= ', ';
+                }
+            }
+        }
 
-        return "insert into {$table} ({$columnList}) values ({$bindingList})";
+        return "insert into {$table} ({$column_list}) values {$binding_list}";
     }
 
-    public static function update(string|array $source, ?string $table = null, string $where = ''): string {
+    public static function update(string|array $source, ?string $table = null, ?string $where = null): string {
         if (is_array($source) && $table === null) {
             Error::assert(false, __METHOD__.': Table name is required when passing an array of columns.');
         }
@@ -45,11 +79,11 @@ final class Common_Sql {
         $columns = [];
         self::resolve_table_and_columns($source, $table, $columns);
 
-        $setParts = implode(', ', array_map(fn(string $col) => "{$col} = :{$col}", $columns));
+        $set_parts = implode(', ', array_map(fn(string $col) => "{$col} = :{$col}", $columns));
 
-        $sql = "update {$table} set {$setParts}";
+        $sql = "update {$table} set {$set_parts}";
 
-        if ($where !== '') {
+        if (!is_null($where)) {
             $sql .= " where {$where}";
         }
 

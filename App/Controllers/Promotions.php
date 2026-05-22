@@ -4,10 +4,11 @@ use App\Core\Context\Request;
 use App\Core\Context\Response;
 use App\Core\Locale;
 use App\Core\Model\DB_Model;
+use App\Core\Model\DB_Type;
 use App\Core\View\Js_Script;
 use App\Views\Common_View;
 use App\Views\Promotions_View;
-use App\Models\User_Privileges;
+use App\Models\Dto\User_Privileges;
 
 final class Promotions {
     private function __construct() {}
@@ -24,8 +25,8 @@ final class Promotions {
             join news_translations nt on n.id = nt.news_id and nt.lang_code = :lang
             where n.type = 'promotion'
         ";
-        $count_stmt = DB_Model::query($count_sql)?->bind_values(['lang' => $lang])?->execute();
-        $total = (int)($count_stmt?->fetch()['cnt'] ?? 0);
+        $count_stmt = DB_Model::query($count_sql)->bind_values(['lang' => $lang])->fetch()->or_else([]);
+        $total = (int)($count_stmt['cnt'] ?? 0);
         $total_pages = max(1, ceil($total / $per_page));
 
         $offset = ($page - 1) * $per_page;
@@ -37,13 +38,12 @@ final class Promotions {
             order by n.date desc
             limit :limit offset :offset
         ";
-        $stmt = DB_Model::query($sql)?->bind_values([
+        $rows = DB_Model::query($sql)->bind_values([
             'lang' => $lang,
             'limit' => $per_page,
             'offset' => $offset,
-        ])?->execute();
+        ])->fetch_all()->or_else([]);
 
-        $rows = $stmt?->fetch_all() ?: [];
         $items = array_map(fn($row) => (object)[
             'id' => $row['id'],
             'date' => $row['date'],
@@ -62,17 +62,17 @@ final class Promotions {
         $id = (int)$req->binds['id'];
         $user = $req->additional['user'] ?? null;
 
-        $stmt = DB_Model::query("
+        $row = DB_Model::query("
             select n.id, n.date, nt.title, nt.content
             from news n
             join news_translations nt on n.id = nt.news_id and nt.lang_code = :lang
             where n.id = :id and n.type = 'promotion'
-        ")?->bind_values(['lang' => $lang, 'id' => $id])?->execute();
+        ")->bind_values(['lang' => $lang, 'id' => $id])->fetch();
 
-        $row = $stmt?->fetch();
-        if (!$row) {
+        if (!$row->ok) {
             return Response::redirect('/promotions');
         }
+        $row = $row->val;
 
         $promotion = (object)[
             'id' => $row['id'],
@@ -116,13 +116,13 @@ final class Promotions {
         }
 
         DB_Model::query("insert into news (date, type) values (:date, 'promotion')")
-            ?->bind_values(['date' => $date])?->execute();
+            ->bind_values(['date' => $date])->execute();
         $promo_id = DB_Model::$conn->lastInsertId();
 
         DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'ru', :title, :preview, :content)")
-            ?->bind_values(['id' => $promo_id, 'title' => $title_ru, 'preview' => $preview_ru, 'content' => $content_ru])?->execute();
+            ->bind_values(['id' => $promo_id, 'title' => $title_ru, 'preview' => $preview_ru, 'content' => $content_ru])->execute();
         DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'en', :title, :preview, :content)")
-            ?->bind_values(['id' => $promo_id, 'title' => $title_en, 'preview' => $preview_en, 'content' => $content_en])?->execute();
+            ->bind_values(['id' => $promo_id, 'title' => $title_en, 'preview' => $preview_en, 'content' => $content_en])->execute();
 
         return Response::redirect('/promotions/' . $promo_id);
     }
@@ -132,15 +132,15 @@ final class Promotions {
         if (!$user) return Response::redirect('/');
         $id = (int)$req->binds['id'];
 
-        $news_stmt = DB_Model::query("select id, date from news where id = :id and type = 'promotion'")
-            ?->bind_values(['id' => $id])?->execute();
-        $news_row = $news_stmt?->fetch();
-        if (!$news_row) return Response::redirect('/promotions');
+        $news_row = DB_Model::query("select id, date from news where id = :id and type = 'promotion'")
+            ->bind_values(['id' => $id])->fetch();
+        if (!$news_row->ok) return Response::redirect('/promotions');
+        $news_row = $news_row->val;
 
         $translations = [];
-        $trans_stmt = DB_Model::query("select lang_code, title, preview, content from news_translations where news_id = :id")
-            ?->bind_values(['id' => $id])?->execute();
-        foreach ($trans_stmt?->fetch_all() ?: [] as $t) {
+        $transl = DB_Model::query("select lang_code, title, preview, content from news_translations where news_id = :id")
+            ->bind_values(['id' => $id])->fetch_all()->or_else([]);
+        foreach ($transl as $t) {
             $translations[$t['lang_code']] = (object)[
                 'title' => $t['title'],
                 'preview' => $t['preview'] ?? '',
@@ -183,19 +183,19 @@ final class Promotions {
         }
 
         DB_Model::query("update news set date = :date where id = :id and type = 'promotion'")
-            ?->bind_values(['date' => $date, 'id' => $id])?->execute();
+            ->bind_values(['date' => $date, 'id' => $id])->execute();
 
         $existing = DB_Model::query("select lang_code from news_translations where news_id = :id")
-            ?->bind_values(['id' => $id])?->execute()?->fetch_all() ?: [];
+            ->bind_values(['id' => $id])->fetch_all()->or_else([]);
         $existing_langs = array_column($existing, 'lang_code');
 
         $upsert = function(string $lang, string $title, string $preview, string $content) use ($id, $existing_langs) {
             if (in_array($lang, $existing_langs)) {
                 DB_Model::query("update news_translations set title=:title, preview=:preview, content=:content where news_id=:id and lang_code=:lang")
-                    ?->bind_values(compact('title', 'preview', 'content', 'id', 'lang'))?->execute();
+                    ->bind_values(compact('title', 'preview', 'content', 'id', 'lang'))->execute();
             } else {
                 DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, :lang, :title, :preview, :content)")
-                    ?->bind_values(compact('id', 'lang', 'title', 'preview', 'content'))?->execute();
+                    ->bind_values(compact('id', 'lang', 'title', 'preview', 'content'))->execute();
             }
         };
         $upsert('ru', $title_ru, $preview_ru, $content_ru);
@@ -208,11 +208,11 @@ final class Promotions {
         $user = self::require_admin($req);
         if (!$user) return Response::redirect('/');
         $id = (int)$req->binds['id'];
-        if (\Config::IS_USING_SQLITE) {
-            DB_Model::query('pragma foreign_keys = on')?->execute();
+        if (DB_Model::$current_db === DB_Type::SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')->execute();
         }
         DB_Model::query("delete from news where id = :id and type = 'promotion'")
-            ?->bind_values(['id' => $id])?->execute();
+            ->bind_values(['id' => $id])->execute();
         return Response::redirect('/promotions');
     }
 

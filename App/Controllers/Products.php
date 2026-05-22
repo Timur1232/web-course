@@ -9,8 +9,13 @@ use App\Core\View\View;
 use App\Views\Common_View;
 use App\Views\Products as Products_View;
 use \App\Core\Helpers\Paginator;
+use App\Core\Model\AR_Reflect;
+use App\Core\Model\DB_Type;
 use App\Core\View\Js_Script;
-use App\Models\User_Privileges;
+use App\Models\Dto\Category;
+use App\Models\Dto\Product;
+use App\Models\Dto\Product_Showcase;
+use App\Models\Dto\User_Privileges;
 
 final class Products {
     private function __construct() {}
@@ -25,37 +30,21 @@ final class Products {
 
         $search = $req->form['search'] ?? null;
 
-        $cat_rows = DB_Model::query("
-            select c.id, ct.name
-            from categories c
-            join category_translations ct on c.id = ct.category_id and ct.lang_code = :lang
-            order by ct.name
-        ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?? [];
-        $categories = array_map(fn($r) => (object)$r, $cat_rows);
+        $cat_rows = DB_Model::query(Category::select_all())
+            ->bind_values(['lang' => $lang])
+            ->fetch_all()
+            ->or_else([]);
+        $categories = AR_Reflect::construct_many(Category::class, $cat_rows);
 
-        $where_category = is_null($category_id) ? '' : 'p.category_id = :cat_id';
-        $where_search = is_null($search) ? '' : 'pt.name like :search';
-
-        if (!is_null($category_id) && !is_null($search)) $where_search = 'and ' . $where_search;
-
-        $where = (is_null($category_id) && is_null($search)) ? '' : 'where';
-
-        $sql = "
-            select p.id, pt.name, p.price,
-                   (select image_url from product_images where product_id = p.id order by number asc limit 1) as image_url
-            from products p
-            join product_translations pt on p.id = pt.product_id and pt.lang_code = :lang
-            {$where} {$where_category} {$where_search}
-            order by p.id
-        ";
-        $stmt = DB_Model::query($sql);
         $bind = ['lang' => $lang];
         if (!is_null($category_id)) $bind['cat_id'] = $category_id;
         if (!is_null($search) && $search !== '') $bind['search'] = "%{$search}%";
-        $stmt?->bind_values($bind);
-        $all_rows = $stmt?->execute()?->fetch_all() ?: [];
 
-        $all_products = array_map(fn($row) => (object)$row, $all_rows);
+        $all_rows = DB_Model::query(Product_Showcase::select_showcase($category_id, $search))
+            ->bind_values($bind)
+            ->fetch_all()
+            ->or_else([]);
+        $all_products = AR_Reflect::construct_many(Product_Showcase::class, $all_rows);
 
         $per_page = 8;
         $paginator = new Paginator($all_products, $per_page);
@@ -97,33 +86,31 @@ final class Products {
         $id = (int)$req->binds['id'];
         $user = $req->additional['user'] ?? null;
 
-        $stmt = DB_Model::query("
-            select p.id, pt.name, pt.description, p.price
-            from products p
-            join product_translations pt on p.id = pt.product_id and pt.lang_code = :lang
-            where p.id = :id
-            ")?->bind_values(['lang' => $lang, 'id' => $id])?->execute();
+        $res = DB_Model::query(Product::select_id())
+            ->bind_values(['lang' => $lang, 'id' => $id])
+            ->fetch();
 
-        if (!$stmt || !($row = $stmt->fetch())) {
+        if (!$res->ok) {
             return Response::redirect('/products');
         }
+        $row = $res->val;
 
         $images = DB_Model::query("
             select image_url from product_images where product_id = :id order by number asc
-            ")?->bind_values(['id' => $id])?->execute()?->fetch_all() ?: [];
+            ")->bind_values(['id' => $id])->fetch_all()->or_else([]);
 
         $reviews_rows = DB_Model::query("
             select author_name, rating, date, text
             from reviews
             where product_id = :id
             order by date desc
-            ")?->bind_values(['id' => $id])?->execute()?->fetch_all() ?: [];
+            ")?->bind_values(['id' => $id])->fetch_all()->or_else([]);
         $reviews = array_map(fn($r) => (object)$r, $reviews_rows);
 
         $avg_row = DB_Model::query("
             select avg(rating) as avg_rating from reviews where product_id = :id
-            ")?->bind_values(['id' => $id])?->execute()?->fetch();
-        $avg_rating = $avg_row ? round((float)($avg_row['avg_rating'] ?? 0), 1) : null;
+            ")->bind_values(['id' => $id])->fetch();
+        $avg_rating = $avg_row->ok ? round((float)($avg_row->val['avg_rating'] ?? 0), 1) : null;
 
         $product = (object)$row;
         $product->images = array_map(fn($r) => (object)$r, $images);
@@ -155,13 +142,12 @@ final class Products {
         }
 
         DB_Model::query("insert into reviews (product_id, author_name, text, rating) values (:pid, :author, :text, :rating)")
-            ?->bind_values([
+            ->bind_values([
                 'pid' => $id,
                 'author' => $user->login,
                 'text' => $text,
                 'rating' => $rating,
-            ])
-            ?->execute();
+            ])->execute();
 
         return Response::redirect("/products/{$id}#reviews");
     }
@@ -181,7 +167,7 @@ final class Products {
             from categories c
             join category_translations ct on c.id = ct.category_id and ct.lang_code = :lang
             order by ct.name
-            ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?: [];
+            ")->bind_values(['lang' => $lang])->fetch_all()->or_else([]);
         $categories = array_map(fn($r) => (object)$r, $cat_rows);
 
         $comp = Products_View::add_product_form($categories);
@@ -222,7 +208,7 @@ final class Products {
                 from categories c
                 join category_translations ct on c.id = ct.category_id and ct.lang_code = :lang
                 order by ct.name
-                ")?->bind_values(['lang' => $lang])?->execute()?->fetch_all() ?: [];
+                ")->bind_values(['lang' => $lang])->fetch_all()->or_else([]);
             $categories = array_map(fn($r) => (object)$r, $cat_rows);
             $error_msg = implode('<br>', $errors);
             $comp = Products_View::add_product_form($categories, $error_msg);
@@ -240,13 +226,13 @@ final class Products {
         }
 
         DB_Model::query("insert into products (category_id, price) values (:cat, :price)")
-        ?->bind_values(['cat' => $category_id, 'price' => $price])?->execute();
+            ->bind_values(['cat' => $category_id, 'price' => $price])->execute();
         $product_id = DB_Model::$conn->lastInsertId();
 
         DB_Model::query("insert into product_translations (product_id, lang_code, name, description) values (:id, 'ru', :name, :desc)")
-        ?->bind_values(['id' => $product_id, 'name' => $name_ru, 'desc' => $description_ru])?->execute();
+            ->bind_values(['id' => $product_id, 'name' => $name_ru, 'desc' => $description_ru])->execute();
         DB_Model::query("insert into product_translations (product_id, lang_code, name, description) values (:id, 'en', :name, :desc)")
-        ?->bind_values(['id' => $product_id, 'name' => $name_en, 'desc' => $description_en])?->execute();
+            ->bind_values(['id' => $product_id, 'name' => $name_en, 'desc' => $description_en])->execute();
 
         if (!empty($_FILES['images']['name'][0])) {
             $upload_dir = 'public/product_images/';
@@ -263,7 +249,7 @@ final class Products {
                     if (move_uploaded_file($tmp_name, $dest)) {
                         $image_url = '/' . $dest;
                         DB_Model::query("insert into product_images (product_id, number, image_url) values (:pid, :num, :url)")
-                        ?->bind_values(['pid' => $product_id, 'num' => $number, 'url' => $image_url])?->execute();
+                            ->bind_values(['pid' => $product_id, 'num' => $number, 'url' => $image_url])->execute();
                         $number++;
                     }
                 }
@@ -286,12 +272,10 @@ final class Products {
         $id = (int)$id;
 
         $images_url = DB_Model::query('select image_url from product_images where product_id = :id')
-            ?->bind_values(['id' => $id])
-            ?->execute()
-            ?->fetch_all();
-        Log::trace(print_r($images_url, true));
-        if (!is_null($images_url)) {
-            foreach ($images_url as $img_url) {
+            ->bind_values(['id' => $id])
+            ->fetch_all();
+        if ($images_url->ok) {
+            foreach ($images_url->val as $img_url) {
                 $img_url = '.' . $img_url['image_url'];
                 if (!str_starts_with($img_url, './public/product_images')) {
                     Log::warning(__METHOD__.": Invalid image placement: $img_url");
@@ -309,12 +293,12 @@ final class Products {
             }
         }
 
-        if (\Config::IS_USING_SQLITE) {
-            DB_Model::query('pragma foreign_keys = on')?->execute();
+        if (DB_Model::$current_db === DB_Type::SQLITE) {
+            DB_Model::query('pragma foreign_keys = on')->execute();
         }
         $res = DB_Model::query('delete from products where id = :id')
-            ?->bind_values(['id' => $id])
-            ?->execute();
+            ->bind_values(['id' => $id])
+            ->execute();
         if (is_null($res)) {
             return Response::redirect('/');
         }

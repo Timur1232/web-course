@@ -25,7 +25,7 @@ final class Cart {
                 from products p
                 join product_translations pt on p.id = pt.product_id and pt.lang_code = ?
                 where p.id in ($placeholders)
-                ")?->bind_values(array_merge([$lang], $ids))?->execute()?->fetch_all() ?: [];
+                ")->bind_values(array_merge([$lang], $ids))->fetch_all()->or_else([]);
 
             foreach ($rows as $row) {
                 $id = $row['id'];
@@ -141,7 +141,7 @@ final class Cart {
         $total = self::get_cart_total($items);
 
         $order_sql = "insert into orders (customer_name, phone, email, payment_method, delivery_method, delivery_address, status, total) values (:name, :phone, :email, :payment, :delivery, :address, 'new', :total)";
-        $order_stmt = DB_Model::query($order_sql)?->bind_values([
+        $order_stmt = DB_Model::query($order_sql)->bind_values([
             'name' => $customer_name,
             'phone' => $phone,
             'email' => $email,
@@ -149,9 +149,9 @@ final class Cart {
             'delivery' => $delivery_method,
             'address' => $delivery_address,
             'total' => $total
-        ])?->execute();
+        ])->execute();
 
-        if (!$order_stmt) {
+        if (!$order_stmt->ok) {
             $content = \App\Views\Cart::cart_page($items, $total, 'Ошибка сервера');
             $user = $req->additional['user'] ?? null;
             return Response::view(Common_View::layout($content, title: Locale::get('cart.title'), page_name: 'cart', user: $user));
@@ -164,8 +164,8 @@ final class Cart {
             $qty = $item['quantity'];
             $price = $item['product']->price;
             DB_Model::query("insert into ordered_products (order_id, product_id, count, price) values (:oid, :pid, :cnt, :price)")
-            ?->bind_values(['oid' => $order_id, 'pid' => $pid, 'cnt' => $qty, 'price' => $price])
-            ?->execute();
+                ->bind_values(['oid' => $order_id, 'pid' => $pid, 'cnt' => $qty, 'price' => $price])
+                ->execute();
         }
 
         $_SESSION['cart'] = [];
@@ -192,7 +192,7 @@ final class Cart {
                 from products p
                 join product_translations pt on p.id = pt.product_id and pt.lang_code = ?
                 where p.id in ($placeholders)
-                ")?->bind_values(array_merge([$lang], $ids))?->execute()?->fetch_all() ?: [];
+                ")->bind_values(array_merge([$lang], $ids))->fetch_all()->or_else([]);
 
             foreach ($rows as $row) {
                 $id = $row['id'];
