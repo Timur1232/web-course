@@ -31,7 +31,7 @@ final class Admin {
         }
 
         $__ = fn($k) => Locale::get('admin.'.$k);
-        $comp = Admin_View::user_list($users->val);
+        $comp = Admin_View::index($users->val);
         return Response::view(Common_View::layout(
             $comp,
             title: $__('page_title'),

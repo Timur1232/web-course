@@ -47,6 +47,32 @@ final class Admin_View {
             HTML;
     }
 
+    public static function shortcut_links(): Component_Func {
+        return View::func(function (): string {
+            return <<<HTML
+                <ul class="site-scheme">
+                    <li><a href="/products/add">Добавить товар</a></li>
+                    <li><a href="/products/add_category">Добавить категорию</a></li>
+                    <br>
+                    <li><a href="/news/new">Добавить новость</a></li>
+                    <li><a href="/promotions/new">Добавить акцию</a></li>
+                    <br>
+                    <li><a href="/about/edit">Редактировать страницу "О нас"</a></li>
+                    <li><a href="/site_scheme/edit">Редактировать страницу "Карта сайта"</a></li>
+                </ul>
+                <hr>
+                HTML;
+        });
+    }
+
+    public static function index(array $users): Component_Func {
+        return View::func(function () use ($users): string {
+            $html = self::shortcut_links()->render();
+            $html .= self::user_list($users)->render();
+            return $html;
+        });
+    }
+
     public static function user_form(?string $error = null): Component_Func {
         return View::func(function () use ($error): string {
             $__ = fn($key, $replace = []) => Locale::get("admin.{$key}", $replace);

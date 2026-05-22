@@ -6,6 +6,7 @@ use App\Core\Locale;
 use App\Core\Model\DB_Model;
 use App\Views\Common_View;
 use App\Views\Feedback_View;
+use Config;
 
 final class Feedback {
     private function __construct() {}
@@ -45,6 +46,15 @@ final class Feedback {
             'email' => $email,
             'message' => $message,
         ])->execute();
+
+        mail(
+            to: Config::MY_EMAIL,
+            subject: 'Feedback from user '.$name,
+            message: $message,
+            additional_headers: [
+                'From' => $email,
+            ]
+        );
 
         $content = Feedback_View::thanks_message();
         return Response::view(Common_View::layout(
