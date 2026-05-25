@@ -48,20 +48,12 @@ typedef struct {
 //     return true;
 // }
 
-// bool on_file_test(Walk_Entry entry)
-// {
-//     if (entry.type != NOB_FILE_REGULAR) return true;
-//     DA_String* paths = entry.data;
-//     String_View sv = sv_from_cstr(entry.path);
-//     if (filter_folders_and_chop(&sv)) {
-//         char* path = temp_strndup(sv.data, sv.count);
-//         for (size_t i = 0; i < sv.count; i++) {
-//             if (path[i] == '/') path[i] = '\\';
-//         }
-//         da_append(paths, path);
-//     }
-//     return true;
-// }
+bool on_file_print(Walk_Entry entry)
+{
+    if (entry.type != NOB_FILE_REGULAR) return true;
+    printf("%s\n", entry.path);
+    return true;
+}
 
 bool on_file_watch(Walk_Entry entry)
 {
@@ -139,7 +131,12 @@ int main(int argc, char** argv)
 
     const char* command = argv[1];
 
-    if (strcmp(command, "test") == 0) {
+    if (strcmp(command, "print") == 0) {
+        if (!walk_dir("./", on_file_print)) {
+            nob_log(NOB_ERROR, "Unable to triverse %s directory for print", APP_DIR);
+            return_defer(1);
+        }
+    } else if (strcmp(command, "test") == 0) {
         // DA_String paths = {0};
         // if (!walk_dir(APP_DIR, on_file_test, .data = &paths)) {
         //     nob_log(NOB_ERROR, "Unable to triverse %s directory for tests", APP_DIR);

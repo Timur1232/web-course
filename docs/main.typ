@@ -643,7 +643,19 @@ JavaScript с применением библиотеки HTMX для динам
 #pagebreak()
 #section_head(numbering: false)[БИБЛИОГРАФИЯ]
 
++ Янцев, В. В. JavaScript и PHP. Content management system / В. В. Янцев. — 2-е изд., испр. — Санкт-Петербург : Лань, 2023. — 192 с. — ISBN 978-5-507-48326-6. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/346460 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
 
++ Алибеков, Б. И. Лабораторный практикум по Web-программированию на PHP : учебное пособие / Б. И. Алибеков. — Махачкала : ДГУ, 2018. — 273 с. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/158357 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
+
++ Кузьменко, И. П. Базы данных и SQL : учебник / И. П. Кузьменко. — Ставрополь : СтГАУ, 2024. — 128 с. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/462110 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
+
++ Гагарин, А. Г. Практикум по разработке Web-приложений с использованием РНР и MySQL : учебное пособие / А. Г. Гагарин, А. Ф. Рогачев. — Волгоград : Волгоградский ГАУ, 2017. — 120 с. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/107832 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
+
++ Годзурас, Э. Docker Compose для разработчика : руководство / Э. Годзурас ; перевод с английского А. Н. Киселева. — Москва : ДМК Пресс, 2023. — 220 с. — ISBN 978-5-93700-203-7. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/348110 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
+
++ Сейерс, Э. Х. Docker на практике / Э. Х. Сейерс, А. Милл ; перевод с английского Д. А. Беликов. — Москва : ДМК Пресс, 2020. — 516 с. — ISBN 978-5-97060-772-5. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/131719 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
+
++ Рудалев, В. Г. Разработка защищенных веб-приложений. Технология asp.net MVC : учебно-методическое пособие / В. Г. Рудалев. — Воронеж : ВГУ, 2020. — 102 с. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/433070 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
 
 #pagebreak()
 #section_head(numbering: false)[ПРИЛОЖЕНИЕ A. Скриншоты разработанных Веб-страниц]
@@ -1330,9 +1342,102 @@ Firefox 3.5 и выше, Opera 10 и выше, Explorer 8 и выше.
 #pagebreak()
 #section_head(numbering: false)[ПРИЛОЖЕНИЕ В. SQL для создания БД сайта]
 
-// #listing_code_file("/sql/init.sql", caption: [SQL код для создания базы данных])
+#let fig_raw(it, letter: "А") = {
+  let fig-num = context counter(raw).display()
+  let cap = if it.caption != none [ -- #it.caption.body] else []
+  [
+    #align(left, [
+      Листинг #letter.#fig-num #cap
+      #parbreak()
+      #it.body
+    ])
+  ]
+}
+
+#counter(raw).update(1)
+#show figure.where(kind: raw): fig_raw.with(letter: "В")
+
+#listing_code_file("./sql/init.sql", caption: [SQL код для создания базы данных])
 
 #pagebreak()
 #section_head(numbering: false)[ПРИЛОЖЕНИЕ Д. Исходный код приложения]
+#counter(raw).update(1)
+#show figure.where(kind: raw): fig_raw.with(letter: "Д")
 
-
+#listing_code_file("./proj_root/Dockerfile", caption: [Скрипт сборки контейнера приложения])
+#listing_code_file("./proj_root/compose.yaml")
+#listing_code_file("./proj_root/nginx.conf")
+#listing_code_file("./proj_root/index.php")
+#listing_code_file("./Config.php")
+#listing_code_file("./proj_root/init.php")
+#listing_code_file("./proj_root/test.php")
+#listing_code_file("./App/Middleware.php")
+#listing_code_file("./App/Views/Promotions_View.php")
+#listing_code_file("./App/Views/Cart.php")
+#listing_code_file("./App/Views/User_Actions.php")
+#listing_code_file("./App/Views/Admin_View.php")
+#listing_code_file("./App/Views/Common_View.php")
+#listing_code_file("./App/Views/Static_Page.php")
+#listing_code_file("./App/Views/Feedback_View.php")
+#listing_code_file("./App/Views/News_View.php")
+#listing_code_file("./App/Views/Products.php")
+#listing_code_file("./App/Models/Dto.php")
+#listing_code_file("./App/Models/db_models.php.old")
+#listing_code_file("./App/Models/Common_Sql.php")
+#listing_code_file("./App/Locale/ru/layout.php")
+#listing_code_file("./App/Locale/ru/about.php")
+#listing_code_file("./App/Locale/ru/products.php")
+#listing_code_file("./App/Locale/ru/promotions.php")
+#listing_code_file("./App/Locale/ru/reviews.php")
+#listing_code_file("./App/Locale/ru/category.php")
+#listing_code_file("./App/Locale/ru/user_actions.php")
+#listing_code_file("./App/Locale/ru/cart.php")
+#listing_code_file("./App/Locale/ru/news.php")
+#listing_code_file("./App/Locale/ru/feedback.php")
+#listing_code_file("./App/Locale/ru/admin.php")
+#listing_code_file("./App/Locale/ru/site_scheme.php")
+#listing_code_file("./App/Locale/en/layout.php")
+#listing_code_file("./App/Locale/en/about.php")
+#listing_code_file("./App/Locale/en/products.php")
+#listing_code_file("./App/Locale/en/promotions.php")
+#listing_code_file("./App/Locale/en/reviews.php")
+#listing_code_file("./App/Locale/en/category.php")
+#listing_code_file("./App/Locale/en/user_actions.php")
+#listing_code_file("./App/Locale/en/cart.php")
+#listing_code_file("./App/Locale/en/news.php")
+#listing_code_file("./App/Locale/en/feedback.php")
+#listing_code_file("./App/Locale/en/admin.php")
+#listing_code_file("./App/Locale/en/site_scheme.php")
+#listing_code_file("./App/Jwt_Token.php")
+#listing_code_file("./App/Controllers/News.php")
+#listing_code_file("./App/Controllers/Promotions.php")
+#listing_code_file("./App/Controllers/Admin.php")
+#listing_code_file("./App/Controllers/Cart.php")
+#listing_code_file("./App/Controllers/User_Actions.php")
+#listing_code_file("./App/Controllers/Map.php")
+#listing_code_file("./App/Controllers/Categories.php")
+#listing_code_file("./App/Controllers/Static_Pages.php")
+#listing_code_file("./App/Controllers/Feedback.php")
+#listing_code_file("./App/Controllers/Products.php")
+#listing_code_file("./App/Core/Model/json.php")
+#listing_code_file("./App/Core/Model/init.php")
+#listing_code_file("./App/Core/Model/data_validator.php")
+#listing_code_file("./App/Core/Model/active_record.php")
+#listing_code_file("./App/Core/Model/db_model.php")
+#listing_code_file("./App/Core/View/view.php")
+#listing_code_file("./App/Core/View/init.php")
+#listing_code_file("./App/Core/View/component.php")
+#listing_code_file("./App/Core/Locale.php")
+#listing_code_file("./App/Core/Middleware.php")
+#listing_code_file("./App/Core/Helpers/paginator.php")
+#listing_code_file("./App/Core/Helpers/init.php")
+#listing_code_file("./App/Core/Helpers/result.php")
+#listing_code_file("./App/Core/Helpers/utils.php")
+#listing_code_file("./App/Core/Helpers/defer.php")
+#listing_code_file("./App/Core/Helpers/csv_file.php")
+#listing_code_file("./App/Core/Helpers/my_date_time.php")
+#listing_code_file("./App/Core/Context/init.php")
+#listing_code_file("./App/Core/Context/router.php")
+#listing_code_file("./App/Core/Context/url.php")
+#listing_code_file("./App/Core/Context/context.php")
+#listing_code_file("./App/Core/Test.php")
