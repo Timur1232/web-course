@@ -49,16 +49,17 @@ final class Admin_View {
 
     public static function shortcut_links(): Component_Func {
         return View::func(function (): string {
+            $__ = fn($k) => Locale::get('admin.'.$k);
             return <<<HTML
                 <ul class="site-scheme">
-                    <li><a href="/products/add">Добавить товар</a></li>
-                    <li><a href="/products/add_category">Добавить категорию</a></li>
+                    <li><a href="/products/add">{$__('ln_add_product')}</a></li>
+                    <li><a href="/products/add_category">{$__('ln_add_cat')}</a></li>
                     <br>
-                    <li><a href="/news/new">Добавить новость</a></li>
-                    <li><a href="/promotions/new">Добавить акцию</a></li>
+                    <li><a href="/news/new">{$__('ln_add_news')}</a></li>
+                    <li><a href="/promotions/new">{$__('ln_add_prom')}</a></li>
                     <br>
-                    <li><a href="/about/edit">Редактировать страницу "О нас"</a></li>
-                    <li><a href="/site_scheme/edit">Редактировать страницу "Карта сайта"</a></li>
+                    <li><a href="/about/edit">{$__('ln_edit_about')}</a></li>
+                    <li><a href="/site_scheme/edit">{$__('ln_edit_sitemap')}</a></li>
                 </ul>
                 <hr>
                 HTML;

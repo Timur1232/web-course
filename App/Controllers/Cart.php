@@ -67,7 +67,7 @@ final class Cart {
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . ($count > 0 ? $count : '') . '</span>';
         $button_html = '<button class="product-card-added" disabled>' . htmlspecialchars(Locale::get('products.added')) . '</button>';
 
-        return Response::view(View::func(fn() => $button_html . $oob));
+        return Response::view(View::string($button_html . $oob));
     }
 
     public static function update_quantity(Request $req): Response {
@@ -94,7 +94,7 @@ final class Cart {
         $html = \App\Views\Cart::render_items($items);
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . (count($_SESSION['cart']) > 0 ? count($_SESSION['cart']) : '') . '</span>';
         $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . htmlspecialchars(Locale::get('cart.total')) . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
-        return Response::view(View::func(fn() => $html . $oob . $total_html));
+        return Response::view(View::string($html . $oob . $total_html));
     }
 
     public static function remove(Request $req): Response {
@@ -108,7 +108,7 @@ final class Cart {
         $html = \App\Views\Cart::render_items($items);
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . (count($_SESSION['cart']) > 0 ? count($_SESSION['cart']) : '') . '</span>';
         $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . htmlspecialchars(Locale::get('cart.total')) . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
-        return Response::view(View::func(fn() => $html . $oob . $total_html));
+        return Response::view(View::string($html . $oob . $total_html));
     }
 
     public static function checkout(Request $req): Response {

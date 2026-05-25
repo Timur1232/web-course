@@ -78,13 +78,13 @@ final class Common_View {
                                         <option value="ru" <?= ($_COOKIE['lang'] ?? 'ru') === 'ru' ? 'selected' : '' ?>>RU</option>
                                         <option value="en" <?= ($_COOKIE['lang'] ?? 'ru') === 'en' ? 'selected' : '' ?>>EN</option>
                                     </select>
-                                    <label style="font-size:12px;" for="lang_select">🌐</label>
+                                    <label style="font-size:14px;" for="lang_select">🌐</label>
                                 </div>
                                 <div class="user-actions" id="user-actions">
                                     <?php if (is_null($user)): ?>
                                     <a href="/login" class="login-button"><?= htmlspecialchars($__('login')) ?></a>
                                     <?php else: ?>
-                                    <span class="user-login"><?= htmlspecialchars($user->login) ?></span>
+                                    <span class="user-login"><?= htmlspecialchars(strlen($user->login) > 15 ? substr($user->login, 0, 15).'...' : $user->login) ?></span>
                                     <a href="#" class="logout-button"
                                         onclick="document.cookie='jwt_token=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';location.reload();"
                                     >

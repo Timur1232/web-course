@@ -117,6 +117,7 @@ final class News {
             return Response::redirect('/news/new');
         }
 
+        DB_Model::begin_transaction();
         DB_Model::query("insert into news (date, type) values (:date, 'news')")
             ->bind_values(['date' => $date])
             ->execute();
@@ -128,6 +129,7 @@ final class News {
         DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'en', :title, :preview, :content)")
             ->bind_values(['id' => $news_id, 'title' => $title_en, 'preview' => $preview_en, 'content' => $content_en])
             ->execute();
+        DB_Model::commit();
 
         return Response::redirect('/news/' . $news_id);
     }
@@ -136,25 +138,25 @@ final class News {
         $user = $req->additional['user'];
         $id = (int)$req->binds['id'];
         $news_row = DB_Model::query("select id, date from news where id = :id and type = 'news'")
-            ->bind_values(['id' => $id])->execute()->fetch();
+            ->bind_values(['id' => $id])->fetch();
         if (!$news_row->ok) {
             return Response::redirect('/news');
         }
         $news_row = $news_row->val;
 
         $translations = [];
-        $transl = DB_Model::query("select lang_code, title, content from news_translations where news_id = :id")
-            ->bind_values(['id' => $id])->execute()->fetch_all()->or_else([]);
+        $transl = DB_Model::query("select lang_code, title, preview, content from news_translations where news_id = :id")
+            ->bind_values(['id' => $id])->fetch_all()->or_else([]);
         foreach ($transl as $t) {
             $translations[$t['lang_code']] = (object)[
                 'title' => $t['title'],
-                'preview' => $t['preview'] ?? '',
-                'content' => $t['content']
+                'preview' => $t['preview'],
+                'content' => $t['content'],
             ];
         }
 
-        if (!isset($translations['ru'])) $translations['ru'] = (object)['title' => '', 'content' => ''];
-        if (!isset($translations['en'])) $translations['en'] = (object)['title' => '', 'content' => ''];
+        if (!isset($translations['ru'])) $translations['ru'] = (object)['title' => '', 'content' => '', 'preview' => ''];
+        if (!isset($translations['en'])) $translations['en'] = (object)['title' => '', 'content' => '', 'preview' => ''];
 
         $news = (object)[
             'id' => $news_row['id'],

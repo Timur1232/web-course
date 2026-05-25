@@ -20,4 +20,11 @@ return [
     'invalid_data_err' => 'Invalid data',
     'insert_err'       => 'Insertion error',
     'exists_err'       => 'User already exists',
+
+    'ln_add_product'  => 'Add product',
+    'ln_add_cat'      => 'Add category',
+    'ln_add_news'     => 'Add news',
+    'ln_add_prom'     => 'Add promotion',
+    'ln_edit_about'   => 'Edit "About" page',
+    'ln_edit_sitemap' => 'Edit "Sitemap" page',
 ];
