@@ -14,16 +14,6 @@
   if offset_after { v(2.5em) }
 }
 
-#let figi(path, caption, first: false) = {
-  if first { V() }
-  figure(
-    caption: caption,
-    image("./imgs/" + path)
-  )
-  V()
-}
-
-
 #set page(numbering: "1", number-align: top + center)
 
 #section_head(numbering: false, outlined: false)[АННОТАЦИЯ]
@@ -494,7 +484,7 @@ API-ключей, легко встраивается в проект и обл�
 #V()
 #figure(
   caption: [Диаграмма вариантов использования],
-  image("./imgs/uml.png")
+  image("./imgs/uml.png", width: 40%)
 ) <uml>
 #V()
 
@@ -657,15 +647,33 @@ JavaScript с применением библиотеки HTMX для динам
 
 #pagebreak()
 #section_head(numbering: false)[ПРИЛОЖЕНИЕ A. Скриншоты разработанных Веб-страниц]
-#counter(figure.where(kind: image)).update(0)
-#set figure(numbering: "A.1")
+#[
 
-#figi("products_ru.png", [Главная страница на русском], first: true)
+#show figure.caption: it => {
+  let fig-num = context counter("image").display()
+  counter("image").step()
+  let cap = if it.body != [] [ -- #it.body] else []
+  [Рисунок А.#fig-num #cap]
+}
+
+#let figi(path, caption, first: false, width: 70%) = {
+  if first {
+    V()
+  }
+  figure(
+    caption: caption,
+    image("./imgs/" + path, width: width),
+  )
+  V()
+}
+
+#counter("image").update(0)
+#figi("products_ru.png", [Главная страница на русском])
 #figi("products_en.png", [Главная страница на английском])
-#figi("category_filter.png", [Фильтрация по категориям])
-#figi("searching.png", [Поиск товара])
-#figi("product_page_ru.png", [Подробная информация товара])
-#figi("review.png", [Отзызы о товаре])
+#figi("category_filter.png", [Фильтрация по категориям], width: 85%)
+#figi("searching.png", [Поиск товара], width: 85%)
+#figi("product_page_ru.png", [Подробная информация товара], width: 80%)
+#figi("review.png", [Отзызы о товаре], width: 80%)
 #figi("login.png", [Форма авторизации])
 #figi("register.png", [Форма регистрации])
 #figi("cart.png", [Корзина и оформление заказа])
@@ -683,6 +691,8 @@ JavaScript с применением библиотеки HTMX для динам
 #figi("new_promotion.png", [Создание акции])
 #figi("user_managing.png", [Управление пользователями])
 #figi("new_user.png", [Создание пользователя])
+
+]
 
 #pagebreak()
 #section_head(numbering: false, offset_after: false)[ПРИЛОЖЕНИЕ Б. Техническое задание]
