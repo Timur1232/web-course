@@ -107,7 +107,7 @@ create table if not exists ordered_products (
         on delete cascade
         on update cascade,
     foreign key (product_id) references products(id)
-        on delete cascade
+        on delete set null
         on update cascade
 );
 
