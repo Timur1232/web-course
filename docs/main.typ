@@ -473,7 +473,7 @@ API-ключей, легко встраивается в проект и обл�
 #V()
 #figure(
   caption: [Диаграмма вариантов использования],
-  image("./imgs/uml.png", width: 40%)
+  image("./imgs/uml.png", width: 50%)
 ) <uml>
 #V()
 
@@ -635,6 +635,9 @@ JavaScript с применением библиотеки HTMX для динам
 #pagebreak()
 #section_head(numbering: false)[БИБЛИОГРАФИЯ]
 
+#[
+#set enum(numbering: "1.")
+
 + Янцев, В. В. JavaScript и PHP. Content management system / В. В. Янцев. — 2-е изд., испр. — Санкт-Петербург : Лань, 2023. — 192 с. — ISBN 978-5-507-48326-6. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/346460 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
 
 + Алибеков, Б. И. Лабораторный практикум по Web-программированию на PHP : учебное пособие / Б. И. Алибеков. — Махачкала : ДГУ, 2018. — 273 с. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/158357 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
@@ -648,6 +651,8 @@ JavaScript с применением библиотеки HTMX для динам
 + Сейерс, Э. Х. Docker на практике / Э. Х. Сейерс, А. Милл ; перевод с английского Д. А. Беликов. — Москва : ДМК Пресс, 2020. — 516 с. — ISBN 978-5-97060-772-5. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/131719 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
 
 + Рудалев, В. Г. Разработка защищенных веб-приложений. Технология asp.net MVC : учебно-методическое пособие / В. Г. Рудалев. — Воронеж : ВГУ, 2020. — 102 с. — Текст : электронный \// Лань : электронно-библиотечная система. — URL: https://e.lanbook.com/book/433070 (дата обращения: 25.05.2026). — Режим доступа: для авториз. пользователей.
+
+]
 
 #pagebreak()
 #section_head(numbering: false)[ПРИЛОЖЕНИЕ A. Скриншоты разработанных Веб-страниц]
@@ -706,15 +711,24 @@ JavaScript с применением библиотеки HTMX для динам
 #let form_line(len) = {
   underline(range(0, len).map(i => " ").sum())
 }
+
+#set heading(numbering: "1.", outlined: false)
+#show heading.where(level: 1): it => align(center, it)
+#counter(heading).update(0)
+
+#[
+
+#set par(leading: 0.62em)
+
 // Форма утрерждения
-#align(right, text(size: 12pt)[
+#align(right, par(leading: 0.4em, text(size: 12pt)[
   Утверждаю \
   #form_line(45) \
   #form_line(45) \
   #form_line(45) \
   #sym.quote.chevron.l.double#form_line(10)#sym.quote.chevron.r.double
   #form_line(19) #datetime.today().year() г.
-])
+]))
 #V()
 #V()
 // Заголовок
@@ -727,10 +741,6 @@ JavaScript с применением библиотеки HTMX для динам
     ])
   )
 )
-
-#set heading(numbering: "1.", outlined: false)
-#show heading.where(level: 1): it => align(center, it)
-#counter(heading).update(0)
 
 = НАИМЕНОВАНИЕ И ОБЛАСТЬ ПРИМЕНЕНИЯ
 
@@ -748,10 +758,8 @@ JavaScript с применением библиотеки HTMX для динам
 дальнейшем «Заказчик», и #form_line(32), именуемым в
 дальнейшем «Исполнитель».
 
-Сроки проведения работ: #form_line(15)
-
-Начало работ по созданию Веб-caйта: #form_line(15)
-
+Сроки проведения работ: #form_line(15) \
+Начало работ по созданию Веб-caйта: #form_line(15) \
 Окончание работ: #form_line(15)
 
 = ХАРАКТЕРИСТИКА ОБЪЕКТОВ ПРОЕКТИРОВАНИЯ
@@ -762,6 +770,8 @@ JavaScript с применением библиотеки HTMX для динам
 интерфейс), а также графические и текстовые материалы, для размещения в
 пользовательском интерфейсе сайта. Графические и текстовые материалы
 предоставляются Заказчиком в электронном виде.
+
+]
 
 == Структура сайта
 
@@ -1360,9 +1370,9 @@ Firefox 3.5 и выше, Opera 10 и выше, Explorer 8 и выше.
 #listing_code_file("./proj_root/compose.yaml")
 #listing_code_file("./proj_root/nginx.conf")
 #listing_code_file("./proj_root/index.php")
-#listing_code_file("./Config.php")
+#listing_code_file("./Config_hidden.php")
 #listing_code_file("./proj_root/init.php")
-#listing_code_file("./proj_root/test.php")
+#listing_code_file("./proj_root/tests.php")
 #listing_code_file("./App/Middleware.php")
 #listing_code_file("./App/Views/Promotions_View.php")
 #listing_code_file("./App/Views/Cart.php")
