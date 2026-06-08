@@ -9,10 +9,10 @@ final class Cart {
         return View::func(function () use ($items, $total, $error) {
             $__ = fn($key) => Locale::get("cart.{$key}");
             $html = '<div class="cart-page">';
-            $html .= '<h2>' . htmlspecialchars($__('title')) . '</h2>';
+            $html .= '<h2>' . $__('title') . '</h2>';
 
             $html .= \App\Views\Cart::render_items($items);
-            $html .= '<div class="cart-total" id="cart-total">' . htmlspecialchars($__('total')) . ': ' . number_format($total, 2, '.', ' ') . ' ₸</div>';
+            $html .= '<div class="cart-total" id="cart-total">' . $__('total') . ': ' . number_format($total, 2, '.', ' ') . ' ₸</div>';
 
             if (!empty($items)) {
                 $html .= '<hr>';
@@ -27,14 +27,14 @@ final class Cart {
     public static function render_items(array $items): string {
         $__ = fn($key) => Locale::get("cart.{$key}");
         if (empty($items)) {
-            return '<div class="cart-items" id="cart-items"><p class="empty-cart">' . htmlspecialchars($__('empty_cart')) . '</p></div>';
+            return '<div class="cart-items" id="cart-items"><p class="empty-cart">' . $__('empty_cart') . '</p></div>';
         }
         $rows = '';
         foreach ($items as $item) {
             $p = $item['product'];
             $qty = $item['quantity'];
             $id = $p->id;
-            $name = htmlspecialchars($p->name);
+            $name = $p->name;
             $price = number_format($p->price, 2, '.', ' ');
             $subtotal = number_format($p->price * $qty, 2, '.', ' ');
             $rows .= <<<HTML
@@ -57,7 +57,7 @@ final class Cart {
     public static function checkout_form(?string $error = null): Component {
         return View::func(function () use ($error) {
             $__ = fn($key) => Locale::get("cart.{$key}");
-            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            $error_html = $error ? '<div class="form-error">' . $error . '</div>' : '';
             return <<<HTML
             <form class="form" method="post" action="/cart/checkout" id="checkout-form">
                 <h3 class="form-title">{$__('checkout_title')}</h3>

@@ -8,7 +8,7 @@ final class Feedback_View {
     public static function feedback_form(?string $error = null): Component {
         return View::func(function () use ($error) {
             $__ = fn($key) => Locale::get("feedback.{$key}");
-            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            $error_html = $error ? '<div class="form-error">' . $error . '</div>' : '';
             return <<<HTML
                 <form class="form form-narrow" method="post" action="/feedback">
                     <h2 class="form-title">{$__('title')}</h2>
@@ -28,8 +28,13 @@ final class Feedback_View {
 
     public static function thanks_message(): Component {
         return View::func(function () {
-            $__ = fn($key) => Locale::get("feedback.{$key}");
-            return '<div class="feedback-thanks"><p>' . htmlspecialchars($__('thanks')) . '</p></div>';
+            return '<div class="feedback-thanks"><p>' . Locale::get('feedback.thanks') . '</p></div>';
+        });
+    }
+
+    public static function error_message(): Component {
+        return View::func(function () {
+            return '<div class="feedback-error"><p>' . Locale::get('feedback.error') . '</p></div>';
         });
     }
 }

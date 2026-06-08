@@ -12,25 +12,22 @@ final class News_View {
             $__ = fn($key) => Locale::get("news.{$key}");
             $is_admin = $user && $user->privilege === User_Privileges::ADMIN;
             $html = '<div class="news-list">';
-            $html .= '<h2>' . htmlspecialchars($__('list_title')) . '</h2>';
+            $html .= '<h2>' . $__('list_title') . '</h2>';
 
             if ($is_admin) {
-                $html .= '<a href="/news/new" class="admin-add-btn">' . htmlspecialchars($__('add_button')) . '</a>';
+                $html .= '<a href="/news/new" class="admin-add-btn">' . $__('add_button') . '</a>';
             }
 
             if (empty($news_items)) {
-                $html .= '<p class="no-news">' . htmlspecialchars($__('no_news')) . '</p>';
+                $html .= '<p class="no-news">' . $__('no_news') . '</p>';
             } else {
                 foreach ($news_items as $item) {
-                    $title = htmlspecialchars($item->title);
-                    $date = htmlspecialchars($item->date);
-                    $preview = htmlspecialchars($item->content_preview);
                     $id = (int)$item->id;
                     $html .= <<<HTML
                     <div class="news-item">
-                        <h3><a href="/news/{$id}">{$title}</a></h3>
-                        <span class="news-date">{$date}</span>
-                        <p class="news-preview">{$preview}</p>
+                        <h3><a href="/news/{$id}">{$item->title}</a></h3>
+                        <span class="news-date">{$item->date}</span>
+                        <p class="news-preview">{$item->preview}</p>
                     </div>
                     HTML;
                 }
@@ -55,9 +52,6 @@ final class News_View {
         return View::func(function () use ($news, $user) {
             $__ = fn($key) => Locale::get("news.{$key}");
             $is_admin = $user && $user->privilege === User_Privileges::ADMIN;
-            $title = htmlspecialchars($news->title);
-            $date = htmlspecialchars($news->date);
-            $content = $news->content;
             $id = (int)$news->id;
 
             $admin_buttons = '';
@@ -76,9 +70,9 @@ final class News_View {
             <div class="news-detail">
                 <a href="/news" class="back-link">{$__('back_to_list')}</a>
                 {$admin_buttons}
-                <h2>{$title}</h2>
-                <span class="news-date">{$date}</span>
-                <div class="news-content">{$content}</div>
+                <h2>{$news->title}</h2>
+                <span class="news-date">{$news->date}</span>
+                <div class="news-content">{$news->content}</div>
             </div>
             HTML;
         });
@@ -90,14 +84,14 @@ final class News_View {
             $is_edit = !is_null($news);
             $form_title = $is_edit ? $__('edit_title') : $__('create_title');
 
-            $date_val = $is_edit ? htmlspecialchars($news->date ?? '') : date('Y-m-d');
-            $title_ru_val = $is_edit ? htmlspecialchars($news->translations['ru']->title ?? '') : '';
+            $date_val = $is_edit ? $news->date ?? '' : date('Y-m-d');
+            $title_ru_val = $is_edit ? $news->translations['ru']->title ?? '' : '';
             $content_ru_val = $is_edit ? $news->translations['ru']->content ?? '' : '';
-            $title_en_val = $is_edit ? htmlspecialchars($news->translations['en']->title ?? '') : '';
+            $title_en_val = $is_edit ? $news->translations['en']->title ?? '' : '';
             $content_en_val = $is_edit ? $news->translations['en']->content ?? '' : '';
 
-            $preview_ru_val = $is_edit ? htmlspecialchars($news->translations['ru']->preview ?? '') : '';
-            $preview_en_val = $is_edit ? htmlspecialchars($news->translations['en']->preview ?? '') : '';
+            $preview_ru_val = $is_edit ? $news->translations['ru']->preview ?? '' : '';
+            $preview_en_val = $is_edit ? $news->translations['en']->preview ?? '' : '';
 
             return <<<HTML
                 <form class="form" method="post" action="{$save_url}">

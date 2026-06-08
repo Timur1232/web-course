@@ -3,11 +3,9 @@
 use App\Core\Context\Request;
 use App\Core\Context\Response;
 use App\Core\Locale;
-use App\Core\Model\AR_Reflect;
 use App\Core\Model\DB_Model;
 use App\Core\Model\DB_Type;
 use App\Models\Common_Sql\Common_Sql;
-use App\Models\Dto\Order;
 use App\Models\Dto\User;
 use App\Models\Dto\User_Privilege;
 use App\Models\Dto\User_Privileges;
@@ -32,11 +30,9 @@ final class Admin {
             return Response::redirect('/');
         }
 
-        $__ = fn($k) => Locale::get('admin.'.$k);
-        $comp = Admin_View::index($users->val);
         return Response::view(Common_View::layout(
-            $comp,
-            title: $__('page_title'),
+            Admin_View::index($users->val),
+            title: Locale::get('admin.page_title'),
             page_name: 'admin',
             user: $user
         ));
@@ -55,8 +51,13 @@ final class Admin {
             return Response::redirect('/admin');
         }
 
-        DB_Model::query('update user_privileges set privilege_name = :pr where user_login = :login')->bind_values(['pr' => $privilege->value, 'login' => $login])
-            ->execute();
+        $sql = 'update user_privileges set privilege_name = :pr where user_login = :login';
+        DB_Model::begin_transaction();
+        if (!DB_Model::query($sql)->bind_values(['pr' => $privilege->value, 'login' => $login])->execute()->ok) {
+            DB_Model::roll_back();
+        } else {
+            DB_Model::commit();
+        }
 
         return Response::redirect('/admin');
     }
@@ -68,12 +69,17 @@ final class Admin {
             return Response::redirect('/admin');
         }
 
+        DB_Model::begin_transaction();
         if (DB_Model::$current_db === DB_Type::SQLITE) {
             DB_Model::query('pragma foreign_keys = on')->execute();
         }
-        DB_Model::query('delete from users where login = :login')
+        if (!DB_Model::query('delete from users where login = :login')
             ->bind_values(['login' => $login])
-            ->execute();
+            ->execute()->ok) {
+            DB_Model::roll_back();
+        } else {
+            DB_Model::commit();
+        }
 
         return Response::redirect('/admin');
     }
@@ -147,6 +153,7 @@ final class Admin {
             select * from orders
             order by date desc
         ";
+
         $rows = DB_Model::query($sql)->fetch_all()->or_else([]);
         $items = array_map(fn($v) => (object)$v, $rows);
 

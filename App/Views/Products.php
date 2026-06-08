@@ -15,21 +15,21 @@ final class Products {
             $html = '';
             if ($is_admin) {
                 $html .= '<a href="/products/add_category" class="admin-add-btn" style="margin-bottom:20px;">'
-                    . htmlspecialchars($__('add_category')) . '</a>';
+                    . $__('add_category') . '</a>';
             }
             $html .= '<div class="categories-panel">';
-            $html .= '<h3>' . htmlspecialchars($__('categories')) . '</h3>';
+            $html .= '<h3>' . $__('categories') . '</h3>';
             $html .= '<ul>';
             $active_class = is_null($active_id) ? ' class="active"' : '';
-            $html .= '<li><a class="categories-panel-link" href="/products"' . $active_class . '>' . htmlspecialchars($__('all_categories')) . '</a></li>';
+            $html .= '<li><a class="categories-panel-link" href="/products"' . $active_class . '>' . $__('all_categories') . '</a></li>';
 
             foreach ($categories as $cat) {
                 $active = ($active_id == $cat->id) ? ' class="active"' : '';
                 $html .= $is_admin ? '<li class="categories-panel-link-with-controls">' : '<li>';
                 $html .= '<a class="categories-panel-link" href="/products?category=' . $cat->id . '"' . $active . '>'
-                    . htmlspecialchars($cat->name) . '</a>';
+                    . $cat->name . '</a>';
                 if ($is_admin) {
-                    $confirm = htmlspecialchars(Locale::get('category.delete_confirm'));
+                    $confirm = Locale::get('category.delete_confirm');
                     $html .= <<<HTML
                         <a href="/products/edit_category/{$cat->id}" title="Редактировать">✎</a>
                         <a href="/products/delete_category/{$cat->id}" onclick="return confirm('{$confirm}')" title="Удалить">✕</a>
@@ -46,8 +46,8 @@ final class Products {
     public static function product_card(Product_Showcase $product, array $cart_ids = []): Component {
         return View::func(function () use ($product, $cart_ids) {
             $__ = fn($key) => Locale::get("products.{$key}");
-            $img = htmlspecialchars($product->image_url ?? '/public/media/placeholder.png');
-            $name = htmlspecialchars($product->name);
+            $img = $product->image_url ?? '/public/media/placeholder.png';
+            $name = $product->name;
             $price = number_format($product->price, 2, '.', ' ');
             $id = (int)$product->id;
             $in_cart = in_array($id, $cart_ids);
@@ -75,10 +75,10 @@ final class Products {
         return View::func(function () use ($products, $is_admin, $search, $cart_ids) {
             $html = '';
             if ($is_admin) {
-                $html .= '<a href="/products/add" class="admin-add-btn" style="margin-bottom:20px;">' . htmlspecialchars(Locale::get('products.add_product')) . '</a>';
+                $html .= '<a href="/products/add" class="admin-add-btn" style="margin-bottom:20px;">' . Locale::get('products.add_product') . '</a>';
             }
             if (empty($products)) {
-                $html .= '<p class="no-products">' . htmlspecialchars(Locale::get('products.no_products')) . '</p>';
+                $html .= '<p class="no-products">' . Locale::get('products.no_products') . '</p>';
                 return $html;
             }
             $cards = array_map(fn($p) => self::product_card($p, $cart_ids)->render(), $products);
@@ -109,8 +109,8 @@ final class Products {
     public static function product_detail(object $product, array $cart_ids = [], ?User $user = null, array $reviews = [], ?float $avg_rating = null): Component {
         return View::func(function () use ($product, $cart_ids, $user, $reviews, $avg_rating) {
             $__ = fn($key) => Locale::get("products.{$key}");
-            $img_first = htmlspecialchars($product->images[0]->image_url ?? '/public/media/placeholder.png');
-            $name = htmlspecialchars($product->name);
+            $img_first = $product->images[0]->image_url ?? '/public/media/placeholder.png';
+            $name = $product->name;
             $price = number_format($product->price, 2, '.', ' ');
             $desc = $product->description ?? '';
             $id = (int)$product->id;
@@ -118,7 +118,7 @@ final class Products {
 
             $thumbs = '';
             foreach ($product->images as $img) {
-                $url = htmlspecialchars($img->image_url);
+                $url = $img->image_url;
                 $thumbs .= "<img src=\"{$url}\" class=\"product-thumb\" onclick=\"document.getElementById('main-image').src='{$url}'\">";
             }
 
@@ -168,19 +168,19 @@ final class Products {
         return View::func(function () use ($product_id, $reviews, $avg, $user) {
             $__ = fn($key) => Locale::get("reviews.{$key}");
             $html = '<div class="reviews-section" id="reviews">';
-            $html .= '<h3>' . htmlspecialchars($__('reviews_title')) . '</h3>';
+            $html .= '<h3>' . $__('reviews_title') . '</h3>';
 
             if (is_null($avg)) {
-                $html .= '<p class="no-reviews">' . htmlspecialchars($__('no_reviews')) . '</p>';
+                $html .= '<p class="no-reviews">' . $__('no_reviews') . '</p>';
             } else {
-                $html .= '<p class="average-rating">' . htmlspecialchars($__('average_rating')) . ': ' . number_format($avg, 1) . ' ' . htmlspecialchars($__('out_of_5')) . '</p>';
+                $html .= '<p class="average-rating">' . $__('average_rating') . ': ' . number_format($avg, 1) . ' ' . $__('out_of_5') . '</p>';
             }
 
             if ($user) {
                 $html .= self::review_form($product_id)->render();
             } else {
                 $redirect = urlencode("/products/{$product_id}#reviews");
-                $html .= '<a href="/login?redirect=' . $redirect . '" class="login-to-review">' . htmlspecialchars($__('login_to_review')) . '</a>';
+                $html .= '<a href="/login?redirect=' . $redirect . '" class="login-to-review">' . $__('login_to_review') . '</a>';
             }
 
             foreach ($reviews as $r) {
@@ -195,10 +195,10 @@ final class Products {
 
     public static function review_item(object $review): Component {
         return View::func(function () use ($review) {
-            $author = htmlspecialchars($review->author_name);
+            $author = $review->author_name;
             $rating = (int)$review->rating;
-            $date = htmlspecialchars($review->date);
-            $text = nl2br(htmlspecialchars($review->text));
+            $date = $review->date;
+            $text = nl2br($review->text);
             return <<<HTML
                 <div class="review-item">
                     <div class="review-header">
@@ -262,9 +262,9 @@ final class Products {
             $__ = fn($key) => Locale::get("products.{$key}");
             $cat_options = '';
             foreach ($categories as $cat) {
-                $cat_options .= '<option value="' . $cat->id . '">' . htmlspecialchars($cat->name) . '</option>';
+                $cat_options .= '<option value="' . $cat->id . '">' . $cat->name . '</option>';
             }
-            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            $error_html = $error ? '<div class="form-error">' . $error . '</div>' : '';
             return <<<HTML
                 <div class="form">
                     <h2 class="form-title">{$__('add_product_title')}</h2>

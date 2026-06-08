@@ -7,5 +7,6 @@ return [
     'message' => 'Message',
     'submit' => 'Send',
     'thanks' => 'Thank you! Your message has been sent. We will contact you.',
+    'error' => 'An error happened! Please try again.',
     'error_missing' => 'Please fill in all fields.',
 ];

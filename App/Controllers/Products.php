@@ -137,28 +137,31 @@ final class Products {
         $rating = (int)($req->form['rating'] ?? 0);
         $text = trim($req->form['text'] ?? '');
 
+        $resp = Response::redirect("/products/{$id}#reviews");
+
         if ($rating < 1 || $rating > 5 || empty($text)) {
-            return Response::redirect("/products/{$id}#reviews");
+            return $resp;
         }
 
-        DB_Model::query("insert into reviews (product_id, author_name, text, rating) values (:pid, :author, :text, :rating)")
+        DB_Model::begin_transaction();
+        $res = DB_Model::query("insert into reviews (product_id, author_name, text, rating) values (:pid, :author, :text, :rating)")
             ->bind_values([
                 'pid' => $id,
                 'author' => $user->login,
                 'text' => $text,
                 'rating' => $rating,
             ])->execute();
+        if (!$res->ok) {
+            DB_Model::roll_back();
+            return $resp;
+        }
+        DB_Model::commit();
 
-        return Response::redirect("/products/{$id}#reviews");
-    }
-
-    private static function require_admin(Request $req): ?object {
-        $user = $req->additional['user'] ?? null;
-        return ($user && $user->privilege === User_Privileges::ADMIN) ? $user : null;
+        return $resp;
     }
 
     public static function add_form(Request $req): Response {
-        $user = self::require_admin($req);
+        $user = $req->additional['user'];
         if (!$user) return Response::redirect('/');
 
         $lang = Locale::get_language();
@@ -185,7 +188,7 @@ final class Products {
     }
 
     public static function create(Request $req): Response {
-        $user = self::require_admin($req);
+        $user = $req->additional['user'];
         if (!$user) return Response::redirect('/');
 
         $name_ru = trim($req->form['name_ru'] ?? '');
@@ -225,14 +228,26 @@ final class Products {
             ));
         }
 
-        DB_Model::query("insert into products (category_id, price) values (:cat, :price)")
-            ->bind_values(['cat' => $category_id, 'price' => $price])->execute();
+        $err_resp = Response::redirect('/products/add');
+        DB_Model::begin_transaction();
+        if (!DB_Model::query("insert into products (category_id, price) values (:cat, :price)")
+            ->bind_values(['cat' => $category_id, 'price' => $price])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
         $product_id = DB_Model::$conn->lastInsertId();
 
-        DB_Model::query("insert into product_translations (product_id, lang_code, name, description) values (:id, 'ru', :name, :desc)")
-            ->bind_values(['id' => $product_id, 'name' => $name_ru, 'desc' => $description_ru])->execute();
-        DB_Model::query("insert into product_translations (product_id, lang_code, name, description) values (:id, 'en', :name, :desc)")
-            ->bind_values(['id' => $product_id, 'name' => $name_en, 'desc' => $description_en])->execute();
+        if (!DB_Model::query("insert into product_translations (product_id, lang_code, name, description) values (:id, 'ru', :name, :desc)")
+            ->bind_values(['id' => $product_id, 'name' => $name_ru, 'desc' => $description_ru])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        if (!DB_Model::query("insert into product_translations (product_id, lang_code, name, description) values (:id, 'en', :name, :desc)")
+            ->bind_values(['id' => $product_id, 'name' => $name_en, 'desc' => $description_en])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        DB_Model::commit();
 
         if (!empty($_FILES['images']['name'][0])) {
             $upload_dir = 'public/product_images/';
@@ -260,7 +275,7 @@ final class Products {
     }
 
     public static function delete(Request $req): Response {
-        $user = self::require_admin($req);
+        $user = $req->additional['user'];
         if (is_null($user)) {
             return Response::redirect('/login');
         }
@@ -293,6 +308,7 @@ final class Products {
             }
         }
 
+        DB_Model::begin_transaction();
         if (DB_Model::$current_db === DB_Type::SQLITE) {
             DB_Model::query('pragma foreign_keys = on')->execute();
         }
@@ -300,8 +316,10 @@ final class Products {
             ->bind_values(['id' => $id])
             ->execute();
         if (is_null($res)) {
+            DB_Model::roll_back();
             return Response::redirect('/');
         }
+        DB_Model::commit();
 
         return Response::redirect('/products');
     }

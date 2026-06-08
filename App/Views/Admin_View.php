@@ -1,10 +1,8 @@
 <?php namespace App\Views;
 
-use App\Core\Helpers\My_Date_Time;
 use App\Core\Locale;
 use App\Core\View\Component_Func;
 use App\Core\View\View;
-use App\Models\Dto\Order;
 
 final class Admin_View {
     private function __construct() {}
@@ -82,7 +80,7 @@ final class Admin_View {
     public static function user_form(?string $error = null): Component_Func {
         return View::func(function () use ($error): string {
             $__ = fn($key, $replace = []) => Locale::get("admin.{$key}", $replace);
-            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            $error_html = $error ? '<div class="form-error">' . $error . '</div>' : '';
             return <<<HTML
                 <form class="form" method="post" action="/admin/users/create">
                     <h2 class="form-title">{$__('user_form_title')}</h2>
@@ -106,18 +104,13 @@ final class Admin_View {
     }
 
     private static function order_list_item(object $order): string {
-        $customer = htmlspecialchars($order->customer_name);
-        $date = htmlspecialchars($order->date);
-        $total = htmlspecialchars($order->total);
-        $email = htmlspecialchars($order->email);
-        $phone = htmlspecialchars($order->phone);
         return <<<HTML
             <div class="news-item">
-                <h3>{$customer}</h3>
-                <span class="news-date">{$date}</span>
-                <p class="news-preview">Сумма: {$total} ₸</p>
-                <p class="news-preview">Почта: <a href="mailto:{$email}">{$email}</a></p>
-                <p class="news-preview">Телефон: {$phone}</p>
+                <h3>{$order->customer}</h3>
+                <span class="news-date">{$order->date}</span>
+                <p class="news-preview">Сумма: {$order->total} ₸</p>
+                <p class="news-preview">Почта: <a href="mailto:{$order->email}">{$order->email}</a></p>
+                <p class="news-preview">Телефон: {$order->phone}</p>
             </div>
             HTML;
     }
@@ -139,16 +132,12 @@ final class Admin_View {
     }
 
     private static function callback_list_item(object $callback): string {
-        $customer = htmlspecialchars($callback->name);
-        $date = htmlspecialchars($callback->date);
-        $email = htmlspecialchars($callback->email);
-        $message = htmlspecialchars($callback->message);
         return <<<HTML
             <div class="news-item">
-                <h3>Имя: {$customer}</h3>
-                <span class="news-date">{$date}</span>
-                <p class="news-preview">Почта: <a href="mailto:{$email}">{$email}</a></p>
-                <p class="news-preview">Сообщение: {$message}</p>
+                <h3>Имя: {$callback->customer}</h3>
+                <span class="news-date">{$callback->date}</span>
+                <p class="news-preview">Почта: <a href="mailto:{$callback->email}">{$callback->email}</a></p>
+                <p class="news-preview">Сообщение: {$callback->message}</p>
             </div>
             HTML;
     }

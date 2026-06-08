@@ -111,18 +111,31 @@ final class Promotions {
         $preview_en = trim($req->form['preview_en'] ?? '');
         $content_en = $req->form['content_en'] ?? '';
 
+        $err_resp = Response::redirect('/promotions/new');
+
         if ($title_ru === '' || $title_en === '') {
-            return Response::redirect('/promotions/new');
+            return $err_resp;
         }
 
-        DB_Model::query("insert into news (date, type) values (:date, 'promotion')")
-            ->bind_values(['date' => $date])->execute();
+        DB_Model::begin_transaction();
+        if (!DB_Model::query("insert into news (date, type) values (:date, 'promotion')")
+            ->bind_values(['date' => $date])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
         $promo_id = DB_Model::$conn->lastInsertId();
 
-        DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'ru', :title, :preview, :content)")
-            ->bind_values(['id' => $promo_id, 'title' => $title_ru, 'preview' => $preview_ru, 'content' => $content_ru])->execute();
-        DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'en', :title, :preview, :content)")
-            ->bind_values(['id' => $promo_id, 'title' => $title_en, 'preview' => $preview_en, 'content' => $content_en])->execute();
+        if (!DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'ru', :title, :preview, :content)")
+            ->bind_values(['id' => $promo_id, 'title' => $title_ru, 'preview' => $preview_ru, 'content' => $content_ru])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        if (!DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'en', :title, :preview, :content)")
+            ->bind_values(['id' => $promo_id, 'title' => $title_en, 'preview' => $preview_en, 'content' => $content_en])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        DB_Model::commit();
 
         return Response::redirect('/promotions/' . $promo_id);
     }
@@ -178,28 +191,41 @@ final class Promotions {
         $preview_en = trim($req->form['preview_en'] ?? '');
         $content_en = $req->form['content_en'] ?? '';
 
+        $err_resp = Response::redirect("/promotions/{$id}/edit");
+
         if ($title_ru === '' || $title_en === '') {
-            return Response::redirect("/promotions/{$id}/edit");
+            return $err_resp;
         }
 
-        DB_Model::query("update news set date = :date where id = :id and type = 'promotion'")
-            ->bind_values(['date' => $date, 'id' => $id])->execute();
+        DB_Model::begin_transaction();
+        if (!DB_Model::query("update news set date = :date where id = :id and type = 'promotion'")
+            ->bind_values(['date' => $date, 'id' => $id])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
 
         $existing = DB_Model::query("select lang_code from news_translations where news_id = :id")
             ->bind_values(['id' => $id])->fetch_all()->or_else([]);
         $existing_langs = array_column($existing, 'lang_code');
 
-        $upsert = function(string $lang, string $title, string $preview, string $content) use ($id, $existing_langs) {
+        $upsert = function(string $lang, string $title, string $preview, string $content) use ($id, $existing_langs): bool {
             if (in_array($lang, $existing_langs)) {
-                DB_Model::query("update news_translations set title=:title, preview=:preview, content=:content where news_id=:id and lang_code=:lang")
-                    ->bind_values(compact('title', 'preview', 'content', 'id', 'lang'))->execute();
+                return DB_Model::query("update news_translations set title=:title, preview=:preview, content=:content where news_id=:id and lang_code=:lang")
+                    ->bind_values(compact('title', 'preview', 'content', 'id', 'lang'))->execute()->ok;
             } else {
-                DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, :lang, :title, :preview, :content)")
-                    ->bind_values(compact('id', 'lang', 'title', 'preview', 'content'))->execute();
+                return DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, :lang, :title, :preview, :content)")
+                    ->bind_values(compact('id', 'lang', 'title', 'preview', 'content'))->execute()->ok;
             }
         };
-        $upsert('ru', $title_ru, $preview_ru, $content_ru);
-        $upsert('en', $title_en, $preview_en, $content_en);
+        if (!$upsert('ru', $title_ru, $preview_ru, $content_ru)) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        if (!$upsert('en', $title_en, $preview_en, $content_en)) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        DB_Model::commit();
 
         return Response::redirect('/promotions/' . $id);
     }
@@ -208,11 +234,16 @@ final class Promotions {
         $user = self::require_admin($req);
         if (!$user) return Response::redirect('/');
         $id = (int)$req->binds['id'];
+        DB_Model::begin_transaction();
         if (DB_Model::$current_db === DB_Type::SQLITE) {
             DB_Model::query('pragma foreign_keys = on')->execute();
         }
-        DB_Model::query("delete from news where id = :id and type = 'promotion'")
-            ->bind_values(['id' => $id])->execute();
+        if (!DB_Model::query("delete from news where id = :id and type = 'promotion'")
+            ->bind_values(['id' => $id])->execute()->ok) {
+            DB_Model::roll_back();
+        } else {
+            DB_Model::commit();
+        }
         return Response::redirect('/promotions');
     }
 

@@ -79,7 +79,7 @@ final class User_Actions {
         setcookie('jwt_token', '', time() - 3600, '/');
         if ($req->htmx) {
             $comp = View::func(function () {
-                return '<a href="/login" class="login-button">' . htmlspecialchars(Locale::get('layout.login')) . '</a>';
+                return '<a href="/login" class="login-button">' . Locale::get('layout.login') . '</a>';
             });
             return Response::view($comp);
         }
@@ -136,9 +136,14 @@ final class User_Actions {
             return self::register_error($redirect_url, 'Ошибка сервера');
         }
 
-        DB_Model::query("insert into user_privileges (user_login, privilege_name) values (:login, :priv)")
+        DB_Model::begin_transaction();
+        if (!DB_Model::query("insert into user_privileges (user_login, privilege_name) values (:login, :priv)")
             ->bind_values(['login' => $login, 'priv' => User_Privileges::CUSTOMER->value])
-            ->execute();
+            ->execute()->ok) {
+            DB_Model::roll_back();
+            return self::register_error($redirect_url, Locale::get('user_actions.unable_to_create'));
+        }
+        DB_Model::commit();
 
         $new_user = new User(login: $login, email: $email, password_hash: $password_hash, privilege: User_Privileges::CUSTOMER);
         $jwt = Jwt_Token::generate_jwt($new_user);

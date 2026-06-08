@@ -38,7 +38,8 @@ final class Feedback {
             ));
         }
 
-        DB_Model::query("
+        DB_Model::begin_transaction();
+        $res = DB_Model::query("
             insert into callback_messages (name, email, message)
             values (:name, :email, :message)
         ")->bind_values([
@@ -47,18 +48,26 @@ final class Feedback {
             'message' => $message,
         ])->execute();
 
-        mail(
-            to: Config::MY_EMAIL,
-            subject: 'Feedback from user '.$name,
-            message: $message,
-            additional_headers: [
-                'From' => $email,
-            ]
-        );
+        $comp = null;
+        if (!$res->ok) {
+            DB_Model::roll_back();
+            $comp = Feedback_View::error_message();
+        } else {
+            DB_Model::commit();
 
-        $content = Feedback_View::thanks_message();
+            mail(
+                to: Config::MY_EMAIL,
+                subject: 'Feedback from user '.$name,
+                message: $message,
+                additional_headers: [
+                    'From' => $email,
+                ]
+            );
+            $comp = Feedback_View::thanks_message();
+        }
+
         return Response::view(Common_View::layout(
-            $content,
+            $comp,
             title: Locale::get('feedback.title'),
             page_name: 'feedback',
             user: $user

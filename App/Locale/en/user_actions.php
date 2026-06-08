@@ -12,6 +12,7 @@ return [
     'error_invalid_credentials' => 'Invalid login or password',
     'error_passwords_mismatch' => 'Passwords do not match',
     'error_missing_fields' => 'Please fill in all fields',
+    'unable_to_create' => 'Unable to create user! Please try again.',
     'link_register' => 'Register',
     'link_login' => 'Login',
 ];

@@ -9,8 +9,8 @@ final class User_Actions
     public static function login_form(?string $redirect_url = '', ?string $error = null): Component_Func {
         return View::func(function () use ($redirect_url, $error) {
             $__ = fn($key, $replace = []) => Locale::get("user_actions.{$key}", $replace);
-            $redirect_attr = htmlspecialchars($redirect_url ?? '');
-            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            $redirect_attr = $redirect_url ?? '';
+            $error_html = $error ? '<div class="form-error">' . $error . '</div>' : '';
             return <<<HTML
                 <div class="auth-form">
                     <h2>{$__('login_title')}</h2>
@@ -32,8 +32,8 @@ final class User_Actions
     public static function register_form(?string $redirect_url = '', ?string $error = null): Component_Func {
         return View::func(function () use ($redirect_url, $error) {
             $__ = fn($key, $replace = []) => Locale::get("user_actions.{$key}", $replace);
-            $redirect_attr = htmlspecialchars($redirect_url ?? '');
-            $error_html = $error ? '<div class="form-error">' . htmlspecialchars($error) . '</div>' : '';
+            $redirect_attr = $redirect_url ?? '';
+            $error_html = $error ? '<div class="form-error">' . $error . '</div>' : '';
             return <<<HTML
                 <div class="auth-form">
                     <h2>{$__('register_title')}</h2>

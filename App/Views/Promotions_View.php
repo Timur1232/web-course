@@ -12,25 +12,21 @@ final class Promotions_View {
             $__ = fn($key) => Locale::get("promotions.{$key}");
             $is_admin = $user && $user->privilege === User_Privileges::ADMIN;
             $html = '<div class="promotions-list">';
-            $html .= '<h2>' . htmlspecialchars($__('list_title')) . '</h2>';
+            $html .= '<h2>' . $__('list_title') . '</h2>';
 
             if ($is_admin) {
-                $html .= '<a href="/promotions/new" class="admin-add-btn">' . htmlspecialchars($__('add_button')) . '</a>';
+                $html .= '<a href="/promotions/new" class="admin-add-btn">' . $__('add_button') . '</a>';
             }
 
             if (empty($items)) {
-                $html .= '<p class="no-items">' . htmlspecialchars($__('no_promotions')) . '</p>';
+                $html .= '<p class="no-items">' . $__('no_promotions') . '</p>';
             } else {
                 foreach ($items as $item) {
-                    $title = htmlspecialchars($item->title);
-                    $date = htmlspecialchars($item->date);
-                    $preview = htmlspecialchars($item->preview);
-                    $id = (int)$item->id;
                     $html .= <<<HTML
                     <div class="promotion-item">
-                        <h3><a href="/promotions/{$id}">{$title}</a></h3>
-                        <span class="promotion-date">{$date}</span>
-                        <p class="promotion-preview">{$preview}</p>
+                        <h3><a href="/promotions/{$item->id}">{$item->title}</a></h3>
+                        <span class="promotion-date">{$item->date}</span>
+                        <p class="promotion-preview">{$item->preview}</p>
                     </div>
                     HTML;
                 }
@@ -55,9 +51,6 @@ final class Promotions_View {
         return View::func(function () use ($promotion, $user) {
             $__ = fn($key) => Locale::get("promotions.{$key}");
             $is_admin = $user && $user->privilege === User_Privileges::ADMIN;
-            $title = htmlspecialchars($promotion->title);
-            $date = htmlspecialchars($promotion->date);
-            $content = $promotion->content;
             $id = (int)$promotion->id;
 
             $admin_buttons = '';
@@ -76,9 +69,9 @@ final class Promotions_View {
             <div class="promotion-detail">
                 <a href="/promotions" class="back-link">{$__('back_to_list')}</a>
                 {$admin_buttons}
-                <h2>{$title}</h2>
-                <span class="promotion-date">{$date}</span>
-                <div class="promotion-content">{$content}</div>
+                <h2>{$promotion->title}</h2>
+                <span class="promotion-date">{$promotion->date}</span>
+                <div class="promotion-content">{$promotion->content}</div>
             </div>
             HTML;
         });
@@ -90,12 +83,12 @@ final class Promotions_View {
             $is_edit = !is_null($promotion);
             $form_title = $is_edit ? $__('edit_title') : $__('create_title');
 
-            $date_val = $is_edit ? htmlspecialchars($promotion->date ?? '') : date('Y-m-d');
-            $title_ru_val = $is_edit ? htmlspecialchars($promotion->translations['ru']->title ?? '') : '';
-            $preview_ru_val = $is_edit ? htmlspecialchars($promotion->translations['ru']->preview ?? '') : '';
+            $date_val = $is_edit ? $promotion->date ?? '' : date('Y-m-d');
+            $title_ru_val = $is_edit ? $promotion->translations['ru']->title ?? '' : '';
+            $preview_ru_val = $is_edit ? $promotion->translations['ru']->preview ?? '' : '';
             $content_ru_val = $is_edit ? $promotion->translations['ru']->content ?? '' : '';
-            $title_en_val = $is_edit ? htmlspecialchars($promotion->translations['en']->title ?? '') : '';
-            $preview_en_val = $is_edit ? htmlspecialchars($promotion->translations['en']->preview ?? '') : '';
+            $title_en_val = $is_edit ? $promotion->translations['en']->title ?? '' : '';
+            $preview_en_val = $is_edit ? $promotion->translations['en']->preview ?? '' : '';
             $content_en_val = $is_edit ? $promotion->translations['en']->content ?? '' : '';
 
             return <<<HTML

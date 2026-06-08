@@ -8,7 +8,6 @@ use App\Core\Model\DB_Type;
 use App\Core\View\Js_Script;
 use App\Views\Common_View;
 use App\Views\News_View;
-use App\Models\Dto\User_Privileges;
 
 final class News {
     private function __construct() {}
@@ -46,7 +45,7 @@ final class News {
 
         $items = [];
         foreach ($rows as $row) {
-            $preview = htmlspecialchars($row['preview'] ?? '');
+            $preview = $row['preview'] ?? '';
             $items[] = (object)[
                 'id' => $row['id'],
                 'date' => $row['date'],
@@ -118,20 +117,30 @@ final class News {
         }
 
         DB_Model::begin_transaction();
-        DB_Model::query("insert into news (date, type) values (:date, 'news')")
+        if (!DB_Model::query("insert into news (date, type) values (:date, 'news')")
             ->bind_values(['date' => $date])
-            ->execute();
+            ->execute()->ok) {
+            DB_Model::roll_back();
+            return Response::redirect('/news/new');
+        }
         $news_id = DB_Model::$conn->lastInsertId();
+        $resp = Response::redirect('/news/' . $news_id);
 
-        DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'ru', :title, :preview, :content)")
+        if (!DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'ru', :title, :preview, :content)")
             ->bind_values(['id' => $news_id, 'title' => $title_ru, 'preview' => $preview_ru, 'content' => $content_ru])
-            ->execute();
-        DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'en', :title, :preview, :content)")
+            ->execute()->ok) {
+            DB_Model::roll_back();
+            return $resp;
+        }
+        if (!DB_Model::query("insert into news_translations (news_id, lang_code, title, preview, content) values (:id, 'en', :title, :preview, :content)")
             ->bind_values(['id' => $news_id, 'title' => $title_en, 'preview' => $preview_en, 'content' => $content_en])
-            ->execute();
+            ->execute()->ok) {
+            DB_Model::roll_back();
+            return $resp;
+        }
         DB_Model::commit();
 
-        return Response::redirect('/news/' . $news_id);
+        return $resp;
     }
 
     public static function edit(Request $req): Response {
@@ -185,42 +194,63 @@ final class News {
         $title_en = trim($req->form['title_en'] ?? '');
         $content_en = $req->form['content_en'] ?? '';
 
+        $err_resp = Response::redirect("/news/{$id}/edit");
+
         if ($title_ru === '' || $title_en === '') {
-            return Response::redirect("/news/{$id}/edit");
+            return $err_resp;
         }
 
-        DB_Model::query("update news set date = :date where id = :id and type = 'news'")
-            ->bind_values(['date' => $date, 'id' => $id])->execute();
+        DB_Model::begin_transaction();
+        if (!DB_Model::query("update news set date = :date where id = :id and type = 'news'")
+            ->bind_values(['date' => $date, 'id' => $id])->execute()->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
 
         $existing = DB_Model::query("select lang_code from news_translations where news_id = :id")
             ->bind_values(['id' => $id])->fetch_all()->or_else([]);
         $existing_langs = array_column($existing, 'lang_code');
 
+        $res = null;
         if (in_array('ru', $existing_langs)) {
-            DB_Model::query("update news_translations set title = :title, content = :content where news_id = :id and lang_code = 'ru'")
+            $res = DB_Model::query("update news_translations set title = :title, content = :content where news_id = :id and lang_code = 'ru'")
                 ->bind_values(['title' => $title_ru, 'content' => $content_ru, 'id' => $id])->execute();
         } else {
-            DB_Model::query("insert into news_translations (news_id, lang_code, title, content) values (:id, 'ru', :title, :content)")
+            $res = DB_Model::query("insert into news_translations (news_id, lang_code, title, content) values (:id, 'ru', :title, :content)")
                 ->bind_values(['id' => $id, 'title' => $title_ru, 'content' => $content_ru])->execute();
         }
+        if (!$res->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
         if (in_array('en', $existing_langs)) {
-            DB_Model::query("update news_translations set title = :title, content = :content where news_id = :id and lang_code = 'en'")
+            $res = DB_Model::query("update news_translations set title = :title, content = :content where news_id = :id and lang_code = 'en'")
                 ->bind_values(['title' => $title_en, 'content' => $content_en, 'id' => $id])->execute();
         } else {
-            DB_Model::query("insert into news_translations (news_id, lang_code, title, content) values (:id, 'en', :title, :content)")
+            $res = DB_Model::query("insert into news_translations (news_id, lang_code, title, content) values (:id, 'en', :title, :content)")
                 ->bind_values(['id' => $id, 'title' => $title_en, 'content' => $content_en])->execute();
         }
+        if (!$res->ok) {
+            DB_Model::roll_back();
+            return $err_resp;
+        }
+        DB_Model::commit();
 
         return Response::redirect('/news/' . $id);
     }
 
     public static function delete(Request $req): Response {
+        DB_Model::begin_transaction();
         if (DB_Model::$current_db === DB_Type::SQLITE) {
             DB_Model::query('pragma foreign_keys = on')->execute();
         }
         $id = (int)$req->binds['id'];
-        DB_Model::query("delete from news where id = :id and type = 'news'")
-            ->bind_values(['id' => $id])->execute();
+        if (!DB_Model::query("delete from news where id = :id and type = 'news'")
+            ->bind_values(['id' => $id])->execute()->ok) {
+            DB_Model::roll_back();
+            return Response::redirect('/news');
+        }
+        DB_Model::commit();
 
         return Response::redirect('/news');
     }

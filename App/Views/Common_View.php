@@ -40,7 +40,7 @@ final class Common_View {
             <!DOCTYPE html>
                 <html lang="ru-RU">
                 <head>
-                    <title><?= htmlspecialchars($title) ?></title>
+                    <title><?= $title ?></title>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -62,14 +62,14 @@ final class Common_View {
                     <header>
                         <div class="header-inner">
                             <div class="header-top">
-                                <a href="/" class="logo"><?= htmlspecialchars($__('logo')) ?></a>
+                                <a href="/" class="logo"><?= $__('logo') ?></a>
                                 <form action="/products/search" method="get">
                                     <div class="search-bar">
-                                        <input type="text" name="search" placeholder="<?= htmlspecialchars($__('search_placeholder')) ?>">
-                                        <button type="submit"><?= htmlspecialchars($__('search_button')) ?></button>
+                                        <input type="text" name="search" placeholder="<?= $__('search_placeholder') ?>">
+                                        <button type="submit"><?= $__('search_button') ?></button>
                                     </div>
                                 </form>
-                                <a href="/cart" class="cart-button"><?= htmlspecialchars($__('cart')) ?></a>
+                                <a href="/cart" class="cart-button"><?= $__('cart') ?></a>
                                 <span id="cart-count" class="cart-count">
                                     <?= count($_SESSION['cart'] ?? []) ?: '' ?>
                                 </span>
@@ -82,28 +82,28 @@ final class Common_View {
                                 </div>
                                 <div class="user-actions" id="user-actions">
                                     <?php if (is_null($user)): ?>
-                                    <a href="/login" class="login-button"><?= htmlspecialchars($__('login')) ?></a>
+                                    <a href="/login" class="login-button"><?= $__('login') ?></a>
                                     <?php else: ?>
-                                    <span class="user-login"><?= htmlspecialchars(strlen($user->login) > 15 ? substr($user->login, 0, 15).'...' : $user->login) ?></span>
+                                    <span class="user-login"><?= strlen($user->login) > 15 ? substr($user->login, 0, 15).'...' : $user->login ?></span>
                                     <a href="#" class="logout-button"
                                         onclick="document.cookie='jwt_token=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';location.reload();"
                                     >
-                                        <?= htmlspecialchars($__('logout')) ?>
+                                        <?= $__('logout') ?>
                                     </a>
                                     <?php endif ?>
                                 </div>
                             </div>
                             <nav class="main-nav">
                                 <ul>
-                                    <li><a href="/products" class="<?= $page_name === 'products' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.products')) ?></a></li>
-                                    <li><a href="/about" class="<?= $page_name === 'about' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.about')) ?></a></li>
-                                    <li><a href="/news" class="<?= $page_name === 'news' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.news')) ?></a></li>
-                                    <li><a href="/promotions" class="<?= $page_name === 'promotions' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.promotions')) ?></a></li>
-                                    <li><a href="/feedback" class="<?= $page_name === 'feedback' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.feedback')) ?></a></li>
-                                    <li><a href="/site_scheme" class="<?= $page_name === 'site_scheme' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.site_scheme')) ?></a></li>
-                                    <li><a href="/map" class="<?= $page_name === 'map' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.map')) ?></a></li>
+                                    <li><a href="/products" class="<?= $page_name === 'products' ? 'active' : '' ?>"><?= $__('menu.products') ?></a></li>
+                                    <li><a href="/about" class="<?= $page_name === 'about' ? 'active' : '' ?>"><?= $__('menu.about') ?></a></li>
+                                    <li><a href="/news" class="<?= $page_name === 'news' ? 'active' : '' ?>"><?= $__('menu.news') ?></a></li>
+                                    <li><a href="/promotions" class="<?= $page_name === 'promotions' ? 'active' : '' ?>"><?= $__('menu.promotions') ?></a></li>
+                                    <li><a href="/feedback" class="<?= $page_name === 'feedback' ? 'active' : '' ?>"><?= $__('menu.feedback') ?></a></li>
+                                    <li><a href="/site_scheme" class="<?= $page_name === 'site_scheme' ? 'active' : '' ?>"><?= $__('menu.site_scheme') ?></a></li>
+                                    <li><a href="/map" class="<?= $page_name === 'map' ? 'active' : '' ?>"><?= $__('menu.map') ?></a></li>
                                     <?php if ($user && $user->privilege === User_Privileges::ADMIN): ?>
-                                    <li><a href="/admin" class="<?= $page_name === 'admin' ? 'active' : '' ?>"><?= htmlspecialchars($__('menu.admin')) ?></a></li>
+                                    <li><a href="/admin" class="<?= $page_name === 'admin' ? 'active' : '' ?>"><?= $__('menu.admin') ?></a></li>
                                     <?php endif ?>
                                 </ul>
                             </nav>
@@ -116,7 +116,7 @@ final class Common_View {
                     </div>
                     <footer>
                         <div class="footer-inner">
-                            <?= htmlspecialchars($__('footer', ['year' => date('Y')])) ?>
+                            <?= $__('footer', ['year' => date('Y')]) ?>
                         </div>
                     </footer>
                     <link rel="stylesheet" type="text/css" href="/public/styles/style.css">

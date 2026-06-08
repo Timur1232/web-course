@@ -783,6 +783,12 @@ footer {
     padding: 40px;
     color: green;
 }
+.feedback-error {
+    text-align: center;
+    font-size: 18px;
+    padding: 40px;
+    color: red;
+}
 
 
 /* О нас */

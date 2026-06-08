@@ -51,7 +51,6 @@ Router::$global_middleware = [
 
 Router::GET('/', Products::index(...));
 Router::GET('/products', Products::index(...));
-Router::POST('/products/delete/:id', Products::delete(...));
 Router::GET('/products/search', Products::index(...));
 
 $products_admin = Router::group('/products', middleware: [
@@ -66,6 +65,7 @@ $products_admin->POST('/add_category', Categories::create(...));
 $products_admin->GET('/edit_category/:id', Categories::edit_form(...));
 $products_admin->POST('/edit_category/:id', Categories::update(...));
 $products_admin->GET('/delete_category/:id', Categories::delete(...));
+$products_admin->POST('/products/delete/:id', Products::delete(...));
 
 Router::GET('/products/:id', Products::show(...));
 Router::POST('/products/:id/review', Products::add_review(...));

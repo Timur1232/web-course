@@ -65,7 +65,7 @@ final class Cart {
 
         $count = count($_SESSION['cart']);
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . ($count > 0 ? $count : '') . '</span>';
-        $button_html = '<button class="product-card-added" disabled>' . htmlspecialchars(Locale::get('products.added')) . '</button>';
+        $button_html = '<button class="product-card-added" disabled>' . Locale::get('products.added') . '</button>';
 
         return Response::view(View::string($button_html . $oob));
     }
@@ -93,7 +93,7 @@ final class Cart {
         $total = self::get_cart_total($items);
         $html = \App\Views\Cart::render_items($items);
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . (count($_SESSION['cart']) > 0 ? count($_SESSION['cart']) : '') . '</span>';
-        $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . htmlspecialchars(Locale::get('cart.total')) . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
+        $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . Locale::get('cart.total') . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
         return Response::view(View::string($html . $oob . $total_html));
     }
 
@@ -107,7 +107,7 @@ final class Cart {
         $total = self::get_cart_total($items);
         $html = \App\Views\Cart::render_items($items);
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . (count($_SESSION['cart']) > 0 ? count($_SESSION['cart']) : '') . '</span>';
-        $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . htmlspecialchars(Locale::get('cart.total')) . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
+        $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . Locale::get('cart.total') . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
         return Response::view(View::string($html . $oob . $total_html));
     }
 
@@ -140,6 +140,7 @@ final class Cart {
         $items = self::get_cart_items();
         $total = self::get_cart_total($items);
 
+        DB_Model::begin_transaction();
         $order_sql = "insert into orders (customer_name, phone, email, payment_method, delivery_method, delivery_address, status, total) values (:name, :phone, :email, :payment, :delivery, :address, 'new', :total)";
         $order_stmt = DB_Model::query($order_sql)->bind_values([
             'name' => $customer_name,
@@ -154,6 +155,7 @@ final class Cart {
         if (!$order_stmt->ok) {
             $content = \App\Views\Cart::cart_page($items, $total, 'Ошибка сервера');
             $user = $req->additional['user'] ?? null;
+            DB_Model::roll_back();
             return Response::view(Common_View::layout($content, title: Locale::get('cart.title'), page_name: 'cart', user: $user));
         }
 
@@ -167,10 +169,11 @@ final class Cart {
                 ->bind_values(['oid' => $order_id, 'pid' => $pid, 'cnt' => $qty, 'price' => $price])
                 ->execute();
         }
+        DB_Model::commit();
 
         $_SESSION['cart'] = [];
 
-        $content = View::func(fn() => '<p class="order-success">' . htmlspecialchars(Locale::get('cart.order_success')) . '</p>');
+        $content = View::func(fn() => '<p class="order-success">' . Locale::get('cart.order_success') . '</p>');
         $user = $req->additional['user'] ?? null;
         return Response::view(Common_View::layout(
             $content,
