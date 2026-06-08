@@ -1,8 +1,10 @@
 <?php namespace App\Views;
 
+use App\Core\Helpers\My_Date_Time;
 use App\Core\Locale;
 use App\Core\View\Component_Func;
 use App\Core\View\View;
+use App\Models\Dto\Order;
 
 final class Admin_View {
     private function __construct() {}
@@ -52,6 +54,9 @@ final class Admin_View {
             $__ = fn($k) => Locale::get('admin.'.$k);
             return <<<HTML
                 <ul class="site-scheme">
+                    <li><a href="/admin/orders">{$__('ln_orders')}</a></li>
+                    <li><a href="/admin/callbacks">{$__('ln_callbacks')}</a></li>
+                    <br>
                     <li><a href="/products/add">{$__('ln_add_product')}</a></li>
                     <li><a href="/products/add_category">{$__('ln_add_cat')}</a></li>
                     <br>
@@ -97,6 +102,70 @@ final class Admin_View {
                     <a href="/admin" class="form-cancel" type="reset">{$__('reset_btn')}</a>
                 </form>
             HTML;
+        });
+    }
+
+    private static function order_list_item(object $order): string {
+        $customer = htmlspecialchars($order->customer_name);
+        $date = htmlspecialchars($order->date);
+        $total = htmlspecialchars($order->total);
+        $email = htmlspecialchars($order->email);
+        $phone = htmlspecialchars($order->phone);
+        return <<<HTML
+            <div class="news-item">
+                <h3>{$customer}</h3>
+                <span class="news-date">{$date}</span>
+                <p class="news-preview">Сумма: {$total} ₸</p>
+                <p class="news-preview">Почта: <a href="mailto:{$email}">{$email}</a></p>
+                <p class="news-preview">Телефон: {$phone}</p>
+            </div>
+            HTML;
+    }
+
+    public static function orders_list(array $orders): Component_Func {
+        return View::func(function () use ($orders): string {
+            $list_items = '';
+            foreach ($orders as $order) {
+                $list_items .= self::order_list_item($order);
+            }
+            $title = Locale::get('admin.orders_title');
+            return <<<HTML
+                <h2>{$title}</h2>
+                <div class="orders-list">
+                    {$list_items}
+                </div>
+                HTML;
+        });
+    }
+
+    private static function callback_list_item(object $callback): string {
+        $customer = htmlspecialchars($callback->name);
+        $date = htmlspecialchars($callback->date);
+        $email = htmlspecialchars($callback->email);
+        $message = htmlspecialchars($callback->message);
+        return <<<HTML
+            <div class="news-item">
+                <h3>Имя: {$customer}</h3>
+                <span class="news-date">{$date}</span>
+                <p class="news-preview">Почта: <a href="mailto:{$email}">{$email}</a></p>
+                <p class="news-preview">Сообщение: {$message}</p>
+            </div>
+            HTML;
+    }
+
+    public static function callbacks_list(array $callbacks): Component_Func {
+        return View::func(function () use ($callbacks): string {
+            $list_items = '';
+            foreach ($callbacks as $order) {
+                $list_items .= self::callback_list_item($order);
+            }
+            $title = Locale::get('admin.callbacks_title');
+            return <<<HTML
+                <h2>{$title}</h2>
+                <div class="callbacks-list">
+                    {$list_items}
+                </div>
+                HTML;
         });
     }
 }

@@ -3,9 +3,11 @@
 use App\Core\Context\Request;
 use App\Core\Context\Response;
 use App\Core\Locale;
+use App\Core\Model\AR_Reflect;
 use App\Core\Model\DB_Model;
 use App\Core\Model\DB_Type;
 use App\Models\Common_Sql\Common_Sql;
+use App\Models\Dto\Order;
 use App\Models\Dto\User;
 use App\Models\Dto\User_Privilege;
 use App\Models\Dto\User_Privileges;
@@ -136,5 +138,35 @@ final class Admin {
         DB_Model::commit();
 
         return Response::redirect('/admin');
+    }
+
+    public static function orders(Request $req): Response {
+        $user = $req->additional['user'] ?? null;
+
+        $sql = "
+            select * from orders
+            order by date desc
+        ";
+        $rows = DB_Model::query($sql)->fetch_all()->or_else([]);
+        $items = array_map(fn($v) => (object)$v, $rows);
+
+        $comp = Admin_View::orders_list($items);
+        $title = Locale::get('admin.orders_title');
+        return Response::view(Common_View::layout($comp, title: $title, page_name: 'orders', user: $user));
+    }
+
+    public static function callbacks(Request $req): Response {
+        $user = $req->additional['user'] ?? null;
+
+        $sql = "
+            select * from callback_messages
+            order by date desc
+        ";
+        $rows = DB_Model::query($sql)->fetch_all()->or_else([]);
+        $items = array_map(fn($v) => (object)$v, $rows);
+
+        $comp = Admin_View::callbacks_list($items);
+        $title = Locale::get('admin.callback_title');
+        return Response::view(Common_View::layout($comp, title: $title, page_name: 'callbacks', user: $user));
     }
 }

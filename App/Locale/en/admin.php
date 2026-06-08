@@ -27,4 +27,9 @@ return [
     'ln_add_prom'     => 'Add promotion',
     'ln_edit_about'   => 'Edit "About" page',
     'ln_edit_sitemap' => 'Edit "Sitemap" page',
+    'ln_orders' => 'Orders list',
+    'ln_callbacks' => 'Callbacks messages',
+
+    'orders_title' => 'Orders',
+    'callbacks_title' => 'Callbacks messages',
 ];
