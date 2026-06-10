@@ -104,7 +104,7 @@ header {
     color: var(--color-gold-light);
     text-transform: uppercase;
     letter-spacing: 3px;
-    margin-right: 30px;
+    margin-right: 25px;
     text-decoration: none;
 }
 .search-bar {
