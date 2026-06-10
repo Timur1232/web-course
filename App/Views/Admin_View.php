@@ -106,7 +106,7 @@ final class Admin_View {
     private static function order_list_item(object $order): string {
         return <<<HTML
             <div class="news-item">
-                <h3>{$order->customer}</h3>
+                <h3>{$order->customer_name}</h3>
                 <span class="news-date">{$order->date}</span>
                 <p class="news-preview">Сумма: {$order->total} ₸</p>
                 <p class="news-preview">Почта: <a href="mailto:{$order->email}">{$order->email}</a></p>
@@ -134,7 +134,7 @@ final class Admin_View {
     private static function callback_list_item(object $callback): string {
         return <<<HTML
             <div class="news-item">
-                <h3>Имя: {$callback->customer}</h3>
+                <h3>Имя: {$callback->name}</h3>
                 <span class="news-date">{$callback->date}</span>
                 <p class="news-preview">Почта: <a href="mailto:{$callback->email}">{$callback->email}</a></p>
                 <p class="news-preview">Сообщение: {$callback->message}</p>

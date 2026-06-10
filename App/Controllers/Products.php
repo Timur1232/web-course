@@ -315,7 +315,21 @@ final class Products {
         $res = DB_Model::query('delete from products where id = :id')
             ->bind_values(['id' => $id])
             ->execute();
-        if (is_null($res)) {
+        if (!$res->ok) {
+            DB_Model::roll_back();
+            return Response::redirect('/');
+        }
+        $res = DB_Model::query('delete from product_translations where product_id = :id')
+            ->bind_values(['id' => $id])
+            ->execute();
+        if (!$res->ok) {
+            DB_Model::roll_back();
+            return Response::redirect('/');
+        }
+        $res = DB_Model::query('delete from product_images where product_id = :id')
+            ->bind_values(['id' => $id])
+            ->execute();
+        if (!$res->ok) {
             DB_Model::roll_back();
             return Response::redirect('/');
         }
