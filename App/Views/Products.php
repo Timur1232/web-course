@@ -18,15 +18,15 @@ final class Products {
                     . $__('add_category') . '</a>';
             }
             $html .= '<div class="categories-panel">';
-            $html .= '<h3>' . $__('categories') . '</h3>';
+            $html .= '<p>' . $__('categories') . '</p>';
             $html .= '<ul>';
-            $active_class = is_null($active_id) ? ' class="active"' : '';
-            $html .= '<li><a class="categories-panel-link" href="/products"' . $active_class . '>' . $__('all_categories') . '</a></li>';
+            $active_class = is_null($active_id) ? 'active' : '';
+            $html .= '<li><a class="categories-panel-link ' . $active_class . '" href="/products">' . $__('all_categories') . '</a></li>';
 
             foreach ($categories as $cat) {
-                $active = ($active_id == $cat->id) ? ' class="active"' : '';
+                $active = ($active_id !== null && $active_id === $cat->id) ? 'active' : '';
                 $html .= $is_admin ? '<li class="categories-panel-link-with-controls">' : '<li>';
-                $html .= '<a class="categories-panel-link" href="/products?category=' . $cat->id . '"' . $active . '>'
+                $html .= '<a class="categories-panel-link '.$active.'" href="/products?category=' . $cat->id . '">'
                     . $cat->name . '</a>';
                 if ($is_admin) {
                     $confirm = Locale::get('category.delete_confirm');
@@ -60,7 +60,7 @@ final class Products {
                 <div class="product-card">
                 <a href="/products/{$id}" class="product-card-link">
                 <div class="product-card-image">
-                <img src="{$img}" alt="{$name}">
+                <img src="{$img}" alt="">
                 </div>
                 <div class="product-card-name">{$name}</div>
                 </a>

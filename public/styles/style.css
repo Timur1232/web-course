@@ -463,8 +463,9 @@ footer {
     padding: 15px;
     border: 1px solid #e0d8c8;
 }
-.categories-panel h3 {
+.categories-panel p {
     font-size: 18px;
+    font-weight: 700;
     margin-bottom: 10px;
     color: var(--color-gold-dark);
 }
