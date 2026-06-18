@@ -32,4 +32,11 @@ return [
 
     'orders_title' => 'Orders',
     'callbacks_title' => 'Callbacks messages',
+
+    'orders.link' => 'More...',
+    'orders.title' => 'Order information',
+    'orders.orders_title' => 'Products',
+    'orders.count' => 'Count',
+    'orders.price' => 'Price',
+    'orders.total_price' => 'Total price',
 ];

@@ -21,4 +21,5 @@ return [
     'empty_cart' => 'Cart is empty',
     'order_success' => 'Order placed successfully!',
     'error_missing_fields' => 'Please fill in all required fields',
+    'items_overflow' => 'For wholesale purchases, please contact the store owner.',
 ];

@@ -6,6 +6,7 @@ use App\Core\Context\Response;
 use App\Core\Locale;
 use App\Core\View\View;
 use App\Core\Model\DB_Model;
+use App\Views\Cart as ViewsCart;
 use App\Views\Common_View;
 
 final class Cart {
@@ -82,10 +83,15 @@ final class Cart {
             $_SESSION['cart'] = [];
         }
 
+        $msg = '';
         if (isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id] += $delta;
-            if ($_SESSION['cart'][$product_id] <= 0) {
-                unset($_SESSION['cart'][$product_id]);
+            if ($_SESSION['cart'][$product_id] + $delta > 5) {
+                $msg = '<span id="cart-message" class="form-error" hx-swap-oob="true">'.Locale::get('cart.items_overflow').'</span>';
+            } else {
+                $_SESSION['cart'][$product_id] += $delta;
+                if ($_SESSION['cart'][$product_id] <= 0) {
+                    unset($_SESSION['cart'][$product_id]);
+                }
             }
         }
 
@@ -94,7 +100,7 @@ final class Cart {
         $html = \App\Views\Cart::render_items($items);
         $oob = '<span id="cart-count" class="cart-count" hx-swap-oob="true">' . (count($_SESSION['cart']) > 0 ? count($_SESSION['cart']) : '') . '</span>';
         $total_html = '<div class="cart-total" id="cart-total" hx-swap-oob="true">' . Locale::get('cart.total') . ': ' . number_format($total, 2, '.', ' ') . ' €</div>';
-        return Response::view(View::string($html . $oob . $total_html));
+        return Response::view(View::string($html . $oob . $total_html . $msg));
     }
 
     public static function remove(Request $req): Response {
@@ -115,6 +121,12 @@ final class Cart {
         $cart = $_SESSION['cart'] ?? [];
         if (empty($cart)) {
             return Response::redirect('/cart');
+        }
+        foreach ($cart as $prod) {
+            if ($prod > 5) {
+                $comp = ViewsCart::checkout_form(Locale::get('cart.items_overflow'));
+                return Response::view($comp);
+            }
         }
 
         $customer_name = $req->form['customer_name'] ?? '';

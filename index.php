@@ -135,4 +135,5 @@ $admin->POST('/users/delete', Admin::delete(...));
 $admin->GET('/users/create', Admin::user_form(...));
 $admin->POST('/users/create', Admin::user_create(...));
 $admin->GET('/orders', Admin::orders(...));
+$admin->GET('/order_details', Admin::order_details(...));
 $admin->GET('/callbacks', Admin::callbacks(...));

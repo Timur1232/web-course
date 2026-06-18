@@ -50,7 +50,7 @@ final class News {
                 'id' => $row['id'],
                 'date' => $row['date'],
                 'title' => $row['title'],
-                'content_preview' => $preview,
+                'preview' => $preview,
             ];
         }
 

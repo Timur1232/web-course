@@ -12,6 +12,7 @@ final class Cart {
             $html .= '<h2>' . $__('title') . '</h2>';
 
             $html .= \App\Views\Cart::render_items($items);
+            $html .= '<span id="cart-message"></span>';
             $html .= '<div class="cart-total" id="cart-total">' . $__('total') . ': ' . number_format($total, 2, '.', ' ') . ' ₸</div>';
 
             if (!empty($items)) {

@@ -155,10 +155,45 @@ final class Admin {
         ";
 
         $rows = DB_Model::query($sql)->fetch_all()->or_else([]);
-        $items = array_map(fn($v) => (object)$v, $rows);
+        $orders = array_map(fn($v) => (object)$v, $rows);
 
-        $comp = Admin_View::orders_list($items);
+        $comp = Admin_View::orders_list($orders);
         $title = Locale::get('admin.orders_title');
+        return Response::view(Common_View::layout($comp, title: $title, page_name: 'orders', user: $user));
+    }
+
+    public static function order_details(Request $req): Response {
+        $user = $req->additional['user'] ?? null;
+        $order_id = $req->url->query['order_id'] ?? null;
+        if ($order_id === null) {
+            return Response::redirect('/admin/orders');
+        }
+
+        $res = DB_Model::query('select * from orders where id = :order_id')
+            ->bind_values(['order_id' => $order_id])
+            ->fetch();
+        if (!$res->ok) {
+            return Response::redirect('/admin/orders');
+        }
+        $order = (object)$res->val;
+
+        $sql = <<<SQL
+            select p.id, pt.name, op.count, op.price
+            from products p
+            join ordered_products op on op.product_id = p.id
+            join product_translations pt on p.id = pt.product_id and pt.lang_code = :lang
+            where op.order_id = :order_id
+        SQL;
+
+        $lang = Locale::get_language();
+        $rows = DB_Model::query($sql)
+            ->bind_values(['lang' => $lang, 'order_id' => $order_id])
+            ->fetch_all()
+            ->or_else([]);
+        $ordered = array_map(fn($v) => (object)$v, $rows);
+
+        $title = Locale::get('admin.orders_title');
+        $comp = Admin_View::order_details($order, $ordered);
         return Response::view(Common_View::layout($comp, title: $title, page_name: 'orders', user: $user));
     }
 

@@ -103,14 +103,17 @@ final class Admin_View {
         });
     }
 
-    private static function order_list_item(object $order): string {
+    private static function order_list_item(object $order, bool $details = false): string {
+        $__ = fn($key) => Locale::get("admin.orders.{$key}");
+        $link = $details ? '' : "<a href=\"/admin/order_details?order_id={$order->id}\">{$__('link')}</a>";
         return <<<HTML
             <div class="news-item">
-                <h3>{$order->customer_name}</h3>
+                <h3>{$order->customer_name}</a></h3>
                 <span class="news-date">{$order->date}</span>
                 <p class="news-preview">Сумма: {$order->total} ₸</p>
                 <p class="news-preview">Почта: <a href="mailto:{$order->email}">{$order->email}</a></p>
                 <p class="news-preview">Телефон: {$order->phone}</p>
+                {$link}
             </div>
             HTML;
     }
@@ -129,6 +132,43 @@ final class Admin_View {
                 </div>
                 HTML;
         });
+    }
+
+    public static function order_details(object $order, array $ordered): Component_Func {
+        return View::func(function() use ($order, $ordered): string {
+            $__ = fn($key) => Locale::get("admin.orders.{$key}");
+            $html = '<h2>' . $__('title') . '</h2>';
+            $html .= self::order_list_item($order, details: true);
+            $html .= '<h2>' . $__('orders_title') . '</h2>';
+            $html .= self::ordered_products_list($ordered);
+            return $html;
+        });
+    }
+
+    public static function ordered_products_list(array $items): string {
+        $__ = fn($key) => Locale::get("admin.orders.{$key}");
+        if (empty($items)) {
+            return '<div class="cart-items" id="cart-items"><p class="empty-cart">' . $__('empty_cart') . '</p></div>';
+        }
+        $rows = '';
+        foreach ($items as $p) {
+            $qty = $p->count;
+            $id = $p->id;
+            $name = $p->name;
+            $price = number_format($p->price, 2, '.', ' ');
+            $subtotal = number_format($p->price * $qty, 2, '.', ' ');
+            $rows .= <<<HTML
+            <div class="cart-item" id="cart-item-{$id}">
+                <span class="cart-item-name">{$name}</span>
+                <span class="cart-item-price">{$__('price')}: {$price} ₸</span>
+                <span class="cart-item-qty">
+                    <span class="qty-val">{$__('count')}: {$qty}</span>
+                </span>
+                <span class="cart-item-subtotal">{$__('total_price')}: {$subtotal} ₸</span>
+            </div>
+            HTML;
+        }
+        return '<div class="cart-items" id="cart-items">' . $rows . '</div>';
     }
 
     private static function callback_list_item(object $callback): string {

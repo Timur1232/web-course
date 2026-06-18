@@ -32,4 +32,11 @@ return [
 
     'orders_title' => 'Заказы',
     'callbacks_title' => 'Обратная связь',
+
+    'orders.link' => 'Подробнее...',
+    'orders.title' => 'Информация о заказе',
+    'orders.orders_title' => 'Товары',
+    'orders.count' => 'Количество',
+    'orders.price' => 'Цена',
+    'orders.total_price' => 'Общая цена',
 ];
