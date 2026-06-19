@@ -125,16 +125,23 @@ final class Categories {
         if (!$user) return Response::redirect('/');
         $id = (int)$req->binds['id'];
 
+        $good = true;
         DB_Model::begin_transaction();
         if (DB_Model::$current_db === DB_Type::SQLITE) {
             DB_Model::query('pragma foreign_keys = on')->execute();
         }
         if (!DB_Model::query("delete from categories where id = :id")
             ->bind_values(['id' => $id])->execute()->ok) {
-            DB_Model::roll_back();
-        } else {
-            DB_Model::commit();
+            $good = false;
         }
+        if (DB_Model::$current_db == DB_Type::SQLITE) {
+            if (!DB_Model::query('delete from category_translations where category_id = :id')
+            ->bind_values(['id' => $id])->execute()->ok) {
+                $good = false;
+            }
+        }
+        if ($good) DB_Model::commit();
+        else DB_Model::roll_back();
 
         return Response::redirect('/products');
     }

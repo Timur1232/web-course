@@ -238,12 +238,20 @@ final class Promotions {
         if (DB_Model::$current_db === DB_Type::SQLITE) {
             DB_Model::query('pragma foreign_keys = on')->execute();
         }
+
         if (!DB_Model::query("delete from news where id = :id and type = 'promotion'")
             ->bind_values(['id' => $id])->execute()->ok) {
             DB_Model::roll_back();
-        } else {
-            DB_Model::commit();
+            return Response::redirect('/promotions');
         }
+        if (DB_Model::$current_db == DB_Type::SQLITE) {
+            if (!DB_Model::query('delete from news_translations where news_id = :id')->bind_values(['id' => $id])->execute()->ok) {
+                DB_Model::roll_back();
+                return Response::redirect('/promotions');
+            }
+        }
+        DB_Model::commit();
+
         return Response::redirect('/promotions');
     }
 

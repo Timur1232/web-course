@@ -334,6 +334,10 @@ final class Products {
                 DB_Model::roll_back();
                 return Response::redirect('/');
             }
+            if (!DB_Model::query('delete from reviews where product_id = :id')->bind_values(['id' => $id])->execute()->ok) {
+                DB_Model::roll_back();
+                return Response::redirect('/');
+            }
         }
         DB_Model::commit();
 

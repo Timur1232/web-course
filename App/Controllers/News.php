@@ -250,6 +250,12 @@ final class News {
             DB_Model::roll_back();
             return Response::redirect('/news');
         }
+        if (DB_Model::$current_db == DB_Type::SQLITE) {
+            if (!DB_Model::query('delete from news_translations where news_id = :id')->bind_values(['id' => $id])->execute()->ok) {
+                DB_Model::roll_back();
+                return Response::redirect('/news');
+            }
+        }
         DB_Model::commit();
 
         return Response::redirect('/news');
