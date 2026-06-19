@@ -137,7 +137,8 @@ final class Admin_View {
     public static function order_details(object $order, array $ordered): Component_Func {
         return View::func(function() use ($order, $ordered): string {
             $__ = fn($key) => Locale::get("admin.orders.{$key}");
-            $html = '<h2>' . $__('title') . '</h2>';
+            $html = '<a href="/admin/orders" class="back-link">' . $__('back_link') . '</a>';
+            $html .= '<h2>' . $__('title') . '</h2>';
             $html .= self::order_list_item($order, details: true);
             $html .= '<h2>' . $__('orders_title') . '</h2>';
             $html .= self::ordered_products_list($ordered);

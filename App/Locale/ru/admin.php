@@ -39,4 +39,5 @@ return [
     'orders.count' => 'Количество',
     'orders.price' => 'Цена',
     'orders.total_price' => 'Общая цена',
+    'orders.back_link' => 'Вернуться к списку',
 ];

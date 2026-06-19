@@ -39,4 +39,5 @@ return [
     'orders.count' => 'Count',
     'orders.price' => 'Price',
     'orders.total_price' => 'Total price',
+    'orders.back_link' => 'Back to list',
 ];
