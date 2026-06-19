@@ -52,17 +52,17 @@ final class Admin_View {
             $__ = fn($k) => Locale::get('admin.'.$k);
             return <<<HTML
                 <ul class="site-scheme">
-                    <li><a href="/admin/orders">{$__('ln_orders')}</a></li>
-                    <li><a href="/admin/callbacks">{$__('ln_callbacks')}</a></li>
+                    <li><a href="/admin/orders" class="regular-link">{$__('ln_orders')}</a></li>
+                    <li><a href="/admin/callbacks" class="regular-link">{$__('ln_callbacks')}</a></li>
                     <br>
-                    <li><a href="/products/add">{$__('ln_add_product')}</a></li>
-                    <li><a href="/products/add_category">{$__('ln_add_cat')}</a></li>
+                    <li><a href="/products/add" class="regular-link">{$__('ln_add_product')}</a></li>
+                    <li><a href="/products/add_category" class="regular-link">{$__('ln_add_cat')}</a></li>
                     <br>
-                    <li><a href="/news/new">{$__('ln_add_news')}</a></li>
-                    <li><a href="/promotions/new">{$__('ln_add_prom')}</a></li>
+                    <li><a href="/news/new" class="regular-link">{$__('ln_add_news')}</a></li>
+                    <li><a href="/promotions/new" class="regular-link">{$__('ln_add_prom')}</a></li>
                     <br>
-                    <li><a href="/about/edit">{$__('ln_edit_about')}</a></li>
-                    <li><a href="/site_scheme/edit">{$__('ln_edit_sitemap')}</a></li>
+                    <li><a href="/about/edit" class="regular-link">{$__('ln_edit_about')}</a></li>
+                    <li><a href="/site_scheme/edit" class="regular-link">{$__('ln_edit_sitemap')}</a></li>
                 </ul>
                 <hr>
                 HTML;

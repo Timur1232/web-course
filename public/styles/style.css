@@ -929,3 +929,16 @@ footer {
 .site-scheme li {
     padding: 3px;
 }
+
+
+.regular-link {
+    display: block;
+    padding: 6px 8px;
+    color: var(--color-text);
+    transition: background 0.2s;
+}
+.regular-link.active,
+.regular-link:hover {
+    background: var(--color-gold-light);
+    color: var(--color-black);
+}
